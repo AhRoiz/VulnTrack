@@ -12,7 +12,7 @@ $kpis = [
         'label'   => 'Total Tiket',
         'value'   => $stats['total'],
         'icon'    => 'bi-folder2-open',
-        'cls'     => 'kpi-total vt-kpi-box-primary',
+        'cls'     => 'vt-kpi-box-primary',
         'href'    => 'vulnerabilities.php',
         'caption' => $stats['active'] . ' aktif',
     ],
@@ -20,15 +20,15 @@ $kpis = [
         'label'   => 'Open',
         'value'   => $stats['by_status']['Open'],
         'icon'    => 'bi-exclamation-circle',
-        'cls'     => 'kpi-open',
+        'cls'     => '',
         'href'    => 'vulnerabilities.php?status=Open',
-        'caption' => 'Menunggu triage',
+        'caption' => 'Antrean triage',
     ],
     [
         'label'   => 'Triaged',
         'value'   => $stats['by_status']['Triaged'],
         'icon'    => 'bi-person-check',
-        'cls'     => 'kpi-triaged',
+        'cls'     => '',
         'href'    => 'vulnerabilities.php?status=Triaged',
         'caption' => 'Siap dikerjakan',
     ],
@@ -36,25 +36,25 @@ $kpis = [
         'label'   => 'In Remediation',
         'value'   => $stats['by_status']['In Remediation'],
         'icon'    => 'bi-wrench-adjustable',
-        'cls'     => 'kpi-remediation',
+        'cls'     => '',
         'href'    => 'vulnerabilities.php?status=' . urlencode('In Remediation'),
-        'caption' => 'Sedang diperbaiki',
+        'caption' => 'Dalam perbaikan',
     ],
     [
         'label'   => 'Re-test',
         'value'   => $stats['by_status']['Re-test'],
         'icon'    => 'bi-arrow-repeat',
-        'cls'     => 'kpi-retest',
+        'cls'     => '',
         'href'    => 'vulnerabilities.php?status=Re-test',
-        'caption' => 'Menunggu verifikasi',
+        'caption' => 'Siap diuji ulang',
     ],
     [
         'label'   => 'Closed',
         'value'   => $stats['by_status']['Closed'],
         'icon'    => 'bi-check2-square',
-        'cls'     => 'kpi-closed',
+        'cls'     => '',
         'href'    => 'vulnerabilities.php?status=Closed',
-        'caption' => 'Terverifikasi aman',
+        'caption' => 'Selesai',
     ],
 ];
 
@@ -74,43 +74,31 @@ require VIEW_PATH . '/layout/header.php';
 require VIEW_PATH . '/layout/navbar.php';
 ?>
 <div class="vt-page-header">
-    <div>
-        <h1 class="fw-bold mb-0">Dashboard Keamanan</h1>
-        <p class="vt-page-subtitle">
-            <?php if ($user['role'] === 'developer'): ?>
-                Menampilkan antrean kerentanan yang ditugaskan kepada Anda beserta tenggat SLA aktif.
-            <?php else: ?>
-                Ringkasan temuan kerentanan lintas aset, tahap workflow remediasi, dan kepatuhan SLA.
-            <?php endif; ?>
-        </p>
-    </div>
+    <h1 class="fw-bold mb-0">Dashboard</h1>
     <div class="small text-secondary d-flex align-items-center gap-1">
         <i class="bi bi-clock" aria-hidden="true"></i>
-        <span>Diperbarui <?= e(date('d M Y, H:i')) ?> WIB</span>
+        <span><?= e(date('d M Y, H:i')) ?> WIB</span>
     </div>
 </div>
 
 <?php if ($stats['overdue'] > 0): ?>
-    <div class="vt-alert-overdue d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4" role="alert">
-        <div class="d-flex align-items-center gap-3">
-            <i class="bi bi-exclamation-triangle-fill fs-4" aria-hidden="true"></i>
-            <div>
-                <div class="fw-bold"><?= (int) $stats['overdue'] ?> tiket melewati batas waktu SLA.</div>
-                <div class="small">Prioritaskan perbaikan atau verifikasi pada tiket yang terlambat agar target remediasi terpenuhi.</div>
-            </div>
+    <div class="vt-alert-overdue d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4" role="alert">
+        <div class="d-flex align-items-center gap-2 small fw-semibold">
+            <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+            <span><?= (int) $stats['overdue'] ?> tiket melewati tenggat SLA.</span>
         </div>
         <a href="vulnerabilities.php?sla=overdue" class="btn btn-danger btn-sm">
-            Lihat Tiket Overdue
+            Lihat Overdue
         </a>
     </div>
 <?php endif; ?>
 
-<section aria-label="Ringkasan metrik tiket" class="mb-4">
+<section aria-label="Metrik tiket" class="mb-4">
     <div class="vt-kpi-grid">
         <?php foreach ($kpis as $kpi): ?>
             <a href="<?= e($kpi['href']) ?>" class="vt-kpi-box <?= e($kpi['cls']) ?>">
                 <span class="vt-kpi-stamp" aria-hidden="true">
-                    <i class="bi <?= e(strtolower($kpi['icon'])) ?>"></i>
+                    <i class="bi <?= e($kpi['icon']) ?>"></i>
                 </span>
                 <span class="vt-kpi-body">
                     <span class="vt-kpi-label"><?= e($kpi['label']) ?></span>
@@ -126,21 +114,20 @@ require VIEW_PATH . '/layout/navbar.php';
     <div class="col-lg-5">
         <div class="card vt-card h-100">
             <div class="card-header vt-card-header">
-                <h2 class="vt-card-title">Proporsi Temuan Berdasarkan Severity</h2>
-                <p class="vt-card-subtitle">Distribusi tingkat keparahan CVSS v3.1</p>
+                <h2 class="vt-card-title">Tiket per Severity</h2>
             </div>
             <div class="card-body d-flex align-items-center justify-content-center">
                 <?php if ($stats['total'] === 0): ?>
                     <div class="vt-empty-state">
                         <div class="vt-empty-icon"><i class="bi bi-pie-chart" aria-hidden="true"></i></div>
                         <div class="fw-semibold text-body">Belum ada data severity</div>
-                        <div class="small">Grafik akan muncul setelah laporan kerentanan pertama tercatat.</div>
+                        <div class="small">Data tampil setelah tiket pertama dibuat.</div>
                     </div>
                 <?php else: ?>
                     <div class="vt-chart-wrap">
-                        <canvas id="severityChart" role="img" aria-label="Diagram proporsi kerentanan berdasarkan tingkat keparahan"></canvas>
+                        <canvas id="severityChart" role="img" aria-label="Diagram proporsi tiket per tingkat keparahan"></canvas>
                         <p id="severityChartError" class="vt-empty-state small mb-0" hidden>
-                            Grafik tidak dapat dimuat. Gunakan tabel daftar tiket di bawah untuk melihat rincian severity.
+                            Grafik gagal dimuat. Lihat rincian pada tabel tiket di bawah.
                         </p>
                     </div>
                 <?php endif; ?>
@@ -151,21 +138,20 @@ require VIEW_PATH . '/layout/navbar.php';
     <div class="col-lg-7">
         <div class="card vt-card h-100">
             <div class="card-header vt-card-header">
-                <h2 class="vt-card-title">Sebaran Tiket di Tiap Tahap Workflow</h2>
-                <p class="vt-card-subtitle">Jumlah tiket aktif hingga selesai diverifikasi</p>
+                <h2 class="vt-card-title">Tiket per Tahap Workflow</h2>
             </div>
             <div class="card-body">
                 <?php if ($stats['total'] === 0): ?>
                     <div class="vt-empty-state">
                         <div class="vt-empty-icon"><i class="bi bi-bar-chart" aria-hidden="true"></i></div>
                         <div class="fw-semibold text-body">Belum ada data workflow</div>
-                        <div class="small">Distribusi status akan tampil saat tiket tersedia.</div>
+                        <div class="small">Distribusi status tampil saat tiket tersedia.</div>
                     </div>
                 <?php else: ?>
                     <div class="vt-chart-wrap">
                         <canvas id="statusChart" role="img" aria-label="Diagram batang jumlah tiket per tahap workflow"></canvas>
                         <p id="statusChartError" class="vt-empty-state small mb-0" hidden>
-                            Grafik tidak dapat dimuat. Gunakan filter status pada halaman Kerentanan untuk melihat rinciannya.
+                            Grafik gagal dimuat. Gunakan filter status pada halaman Kerentanan.
                         </p>
                     </div>
                 <?php endif; ?>
@@ -176,14 +162,11 @@ require VIEW_PATH . '/layout/navbar.php';
 
 <div class="card vt-card">
     <div class="card-header vt-card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
-        <div>
-            <h2 class="vt-card-title">Daftar Tiket Kerentanan</h2>
-            <p class="vt-card-subtitle">Urutan terbaru berdasarkan nomor tiket</p>
-        </div>
+        <h2 class="vt-card-title">Tiket Terbaru</h2>
         <div class="d-flex flex-wrap gap-2">
             <a href="vulnerabilities.php" class="btn btn-sm btn-outline-secondary">
                 <i class="bi bi-funnel" aria-hidden="true"></i>
-                <span>Filter Lanjutan</span>
+                <span>Filter</span>
             </a>
             <?php if (Auth::hasRole('admin', 'analyst')): ?>
                 <a href="create_ticket.php" class="btn btn-sm btn-primary">
@@ -197,14 +180,14 @@ require VIEW_PATH . '/layout/navbar.php';
         <?php if (empty($tickets)): ?>
             <div class="vt-empty-state">
                 <div class="vt-empty-icon"><i class="bi bi-inbox" aria-hidden="true"></i></div>
-                <div class="fw-semibold text-body mb-1">Belum ada tiket kerentanan</div>
+                <div class="fw-semibold text-body mb-1">Belum ada tiket</div>
                 <?php if ($user['role'] === 'developer'): ?>
-                    <p class="small mb-0">Saat ini tidak ada celah keamanan yang ditugaskan kepada akun Anda.</p>
+                    <p class="small mb-0">Tidak ada tiket yang ditugaskan ke akun Anda.</p>
                 <?php else: ?>
-                    <p class="small mb-3">Catat temuan keamanan pertama untuk mulai melacak proses remediasi dan SLA.</p>
+                    <p class="small mb-3">Buat tiket pertama untuk mulai melacak remediasi.</p>
                     <a href="create_ticket.php" class="btn btn-sm btn-primary">
                         <i class="bi bi-plus-lg" aria-hidden="true"></i>
-                        <span>Laporkan Celah Baru</span>
+                        <span>Tiket Baru</span>
                     </a>
                 <?php endif; ?>
             </div>

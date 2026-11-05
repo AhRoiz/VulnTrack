@@ -11,12 +11,8 @@ require VIEW_PATH . '/layout/header.php';
 require VIEW_PATH . '/layout/navbar.php';
 ?>
 <div class="vt-page-header">
-    <div>
-        <h1 class="fw-bold mb-0">Audit Log</h1>
-        <p class="vt-page-subtitle">
-            <i class="bi bi-lock-fill me-1" aria-hidden="true"></i>Rekam jejak bersifat tetap (append-only): setiap perubahan status tiket tercatat permanen dan tidak dapat dihapus.
-        </p>
-    </div>
+    <h1 class="fw-bold mb-0">Audit Log</h1>
+    <span class="badge st-open"><i class="bi bi-lock-fill me-1" aria-hidden="true"></i>Append-only</span>
 </div>
 
 <div class="card vt-card">

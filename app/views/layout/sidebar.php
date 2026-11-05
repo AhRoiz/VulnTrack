@@ -26,14 +26,21 @@ $navItems = [
     ],
     [
         'file'  => 'create_ticket.php',
-        'label' => 'Laporkan Celah',
+        'label' => 'Tiket Baru',
         'icon'  => 'bi-plus-square',
         'roles' => ['admin', 'analyst'],
         'badge' => null,
     ],
     [
+        'file'  => 'forum.php',
+        'label' => 'Forum Diskusi',
+        'icon'  => 'bi-chat-left-text',
+        'roles' => ['admin', 'analyst', 'developer'],
+        'badge' => null,
+    ],
+    [
         'file'  => 'assets.php',
-        'label' => 'Manajemen Aset',
+        'label' => 'Aset',
         'icon'  => 'bi-hdd-network',
         'roles' => ['admin'],
         'badge' => null,
@@ -42,6 +49,13 @@ $navItems = [
         'file'  => 'audit_log.php',
         'label' => 'Audit Log',
         'icon'  => 'bi-journal-text',
+        'roles' => ['admin', 'analyst', 'developer'],
+        'badge' => null,
+    ],
+    [
+        'file'  => 'guide.php',
+        'label' => 'Bantuan & Panduan',
+        'icon'  => 'bi-question-circle',
         'roles' => ['admin', 'analyst', 'developer'],
         'badge' => null,
     ],
@@ -69,7 +83,6 @@ $navItems = [
     <?php endif; ?>
 
     <nav class="vt-sidebar-nav" aria-label="Navigasi utama">
-        <div class="vt-sidebar-section-label">Navigasi Utama</div>
         <ul class="vt-nav-list list-unstyled mb-0">
             <?php foreach ($navItems as $item): ?>
                 <?php if ($currentUser && in_array($currentUser['role'], $item['roles'], true)):
@@ -81,7 +94,7 @@ $navItems = [
                             <i class="bi <?= e($item['icon']) ?> vt-nav-icon" aria-hidden="true"></i>
                             <span class="vt-nav-label"><?= e($item['label']) ?></span>
                             <?php if ($item['badge'] !== null): ?>
-                                <span class="vt-nav-badge" title="Tiket belum ditutup"><?= e($item['badge']) ?></span>
+                                <span class="vt-nav-badge" title="Tiket aktif"><?= e($item['badge']) ?></span>
                             <?php endif; ?>
                         </a>
                     </li>
@@ -96,10 +109,9 @@ $navItems = [
                 <?= Csrf::field() ?>
                 <button type="submit" class="vt-sidebar-logout">
                     <i class="bi bi-box-arrow-right vt-nav-icon" aria-hidden="true"></i>
-                    <span class="vt-nav-label">Keluar Sesi</span>
+                    <span class="vt-nav-label">Keluar</span>
                 </button>
             </form>
         </div>
     <?php endif; ?>
 </aside>
-

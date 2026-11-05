@@ -6,8 +6,11 @@ $withNavbar = $withNavbar ?? true;
         </main>
         <footer class="vt-footer">
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
-                <span>&copy; <?= date('Y') ?> <strong><?= e(APP_NAME) ?></strong>. Platform Manajemen Remediasi Kerentanan Internal.</span>
-                <span class="vt-mono">v<?= e(APP_VERSION) ?></span>
+                <span>&copy; <?= date('Y') ?> <strong><?= e(APP_NAME) ?></strong></span>
+                <div class="d-flex align-items-center gap-3">
+                    <a href="guide.php" class="text-secondary text-decoration-none">Panduan</a>
+                    <span class="vt-mono">v<?= e(APP_VERSION) ?></span>
+                </div>
             </div>
         </footer>
     </div>
@@ -20,7 +23,7 @@ $withNavbar = $withNavbar ?? true;
             'success' => 'bi-check-circle-fill text-success',
             'danger'  => 'bi-x-octagon-fill text-danger',
             'warning' => 'bi-exclamation-triangle-fill text-warning',
-            default   => 'bi-info-circle-fill text-primary',
+            default   => 'bi-info-circle-fill vt-text-accent',
         }; ?>
         <div class="toast vt-toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
             <div class="d-flex align-items-start p-3 gap-2">
@@ -39,9 +42,9 @@ $withNavbar = $withNavbar ?? true;
 <?php if (!empty($useCharts)): ?>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <?php endif; ?>
-<script src="assets/js/app.js?v=<?= e(APP_VERSION) ?>-light"></script>
+<script src="assets/js/app.js?v=<?= e(APP_VERSION) ?>-v2"></script>
 <?php foreach ($scripts ?? [] as $src): ?>
-<script src="<?= e($src) ?>?v=<?= e(APP_VERSION) ?>-light"></script>
+<script src="<?= e($src) ?>?v=<?= e(APP_VERSION) ?>-v2"></script>
 <?php endforeach; ?>
 </body>
 </html>

@@ -56,6 +56,14 @@ if (!function_exists('assets')) {
     }
 }
 
+if (!function_exists('forum')) {
+    function forum(): ForumService
+    {
+        static $forum = null;
+        return $forum ??= new ForumService(store());
+    }
+}
+
 // Sinkronisasi data ke $_SESSION['vulnerabilities'] sesuai spesifikasi Checkpoint 1
 if (session_status() === PHP_SESSION_ACTIVE) {
     $_SESSION['vulnerabilities'] = vulns()->all();

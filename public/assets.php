@@ -28,10 +28,7 @@ require VIEW_PATH . '/layout/header.php';
 require VIEW_PATH . '/layout/navbar.php';
 ?>
 <div class="vt-page-header">
-    <div>
-        <h1 class="fw-bold mb-0">Manajemen Aset</h1>
-        <p class="vt-page-subtitle">Daftar aplikasi, layanan API, dan environment yang menjadi cakupan pengujian keamanan.</p>
-    </div>
+    <h1 class="fw-bold mb-0">Manajemen Aset</h1>
     <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#assetModal">
         <i class="bi bi-plus-lg" aria-hidden="true"></i>
         <span>Tambah Aset</span>

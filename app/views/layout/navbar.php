@@ -25,24 +25,25 @@ $user = Auth::user();
                         aria-label="Ciutkan atau bentangkan sidebar">
                     <i class="bi bi-layout-sidebar" aria-hidden="true"></i>
                 </button>
-
-                <span class="vt-topbar-context d-none d-md-inline">
-                    Manajemen Siklus Hidup Kerentanan &amp; Remediasi SLA
-                </span>
             </div>
 
             <div class="d-flex align-items-center gap-2">
                 <?php if (($sidebarStats['overdue'] ?? 0) > 0): ?>
-                    <a href="vulnerabilities.php?sla=overdue" class="vt-topbar-alert" title="Lihat tiket melewati batas SLA">
+                    <a href="vulnerabilities.php?sla=overdue" class="vt-topbar-alert" title="Lihat tiket melewati SLA">
                         <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
                         <span><?= (int) $sidebarStats['overdue'] ?> Overdue</span>
                     </a>
                 <?php endif; ?>
 
+                <a href="guide.php" class="vt-topbar-btn" title="Bantuan &amp; Panduan">
+                    <i class="bi bi-question-circle" aria-hidden="true"></i>
+                    <span class="d-none d-sm-inline">Panduan</span>
+                </a>
+
                 <?php if (Auth::hasRole('admin', 'analyst') && current_page() !== 'create_ticket.php'): ?>
                     <a href="create_ticket.php" class="btn btn-primary btn-sm vt-btn-primary">
-                        <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>
-                        <span>Laporkan Celah</span>
+                        <i class="bi bi-plus-lg" aria-hidden="true"></i>
+                        <span>Tiket Baru</span>
                     </a>
                 <?php endif; ?>
 
@@ -67,10 +68,21 @@ $user = Auth::user();
                             </li>
                             <li><hr class="dropdown-divider my-1"></li>
                             <li>
+                                <a href="forum.php" class="dropdown-item small py-2">
+                                    <i class="bi bi-chat-left-text me-2" aria-hidden="true"></i>Forum Diskusi
+                                </a>
+                            </li>
+                            <li>
+                                <a href="guide.php" class="dropdown-item small py-2">
+                                    <i class="bi bi-question-circle me-2" aria-hidden="true"></i>Bantuan &amp; Panduan
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider my-1"></li>
+                            <li>
                                 <form action="logout.php" method="post" class="m-0">
                                     <?= Csrf::field() ?>
-                                    <button type="submit" class="dropdown-item text-danger fw-medium py-2">
-                                        <i class="bi bi-box-arrow-right me-2" aria-hidden="true"></i>Keluar Sesi
+                                    <button type="submit" class="dropdown-item text-danger fw-medium small py-2">
+                                        <i class="bi bi-box-arrow-right me-2" aria-hidden="true"></i>Keluar
                                     </button>
                                 </form>
                             </li>

@@ -79,14 +79,11 @@ require VIEW_PATH . '/layout/header.php';
 require VIEW_PATH . '/layout/navbar.php';
 ?>
 <div class="vt-page-header">
-    <div>
-        <h1 class="fw-bold mb-0">Daftar Kerentanan</h1>
-        <p class="vt-page-subtitle">Saring laporan berdasarkan tahap workflow, tingkat keparahan CVSS, aset, atau batas SLA.</p>
-    </div>
+    <h1 class="fw-bold mb-0">Kerentanan</h1>
     <?php if (Auth::hasRole('admin', 'analyst')): ?>
         <a href="create_ticket.php" class="btn btn-primary btn-sm">
             <i class="bi bi-plus-lg" aria-hidden="true"></i>
-            <span>Laporkan Celah Baru</span>
+            <span>Tiket Baru</span>
         </a>
     <?php endif; ?>
 </div>

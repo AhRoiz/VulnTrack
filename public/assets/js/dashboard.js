@@ -23,17 +23,17 @@
     Chart.defaults.color = '#475569';
 
     const SEVERITY_COLORS = {
-        Critical: '#c81e1e',
-        High: '#c2410c',
-        Medium: '#1d4ed8',
+        Critical: '#991b1b',
+        High: '#c83713',
+        Medium: '#a16207',
         Low: '#475569',
     };
 
     const STATUS_COLORS = {
-        Open: '#0369a1',
-        Triaged: '#1d4ed8',
+        Open: '#64748b',
+        Triaged: '#c83713',
         'In Remediation': '#b45309',
-        'Re-test': '#c2410c',
+        'Re-test': '#0f766e',
         Closed: '#15803d',
     };
 
@@ -55,7 +55,7 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 animation: reducedMotion ? false : undefined,
-                cutout: '52%',
+                cutout: '54%',
                 plugins: {
                     legend: {
                         position: 'bottom',
@@ -88,9 +88,9 @@
                 datasets: [{
                     label: 'Jumlah Tiket',
                     data: data.status.data,
-                    backgroundColor: data.status.labels.map((l) => STATUS_COLORS[l] || '#1d4ed8'),
+                    backgroundColor: data.status.labels.map((l) => STATUS_COLORS[l] || '#475569'),
                     borderRadius: 4,
-                    maxBarThickness: 52,
+                    maxBarThickness: 48,
                 }],
             },
             options: {
@@ -107,7 +107,7 @@
                         grid: { color: '#e2e8f0' },
                     },
                     x: {
-                        ticks: { color: '#1e293b', font: { weight: '500' } },
+                        ticks: { color: '#334155', font: { weight: '500' } },
                         grid: { display: false },
                     },
                 },

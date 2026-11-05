@@ -3,6 +3,9 @@
 /storage/uploads/*
 !/storage/uploads/.gitkeep
 
+/redesign.md
+/agent.md
+
 # OS / editor
 .DS_Store
 Thumbs.db

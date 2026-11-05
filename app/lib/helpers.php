@@ -70,6 +70,25 @@ function fmt_date(?string $date, string $format = 'd M Y, H:i'): string
     return $date ? date($format, strtotime($date)) : '-';
 }
 
+function fmt_forum_time(?string $date): string
+{
+    if (!$date) {
+        return '-';
+    }
+    $ts = strtotime($date);
+    if ($ts === false) {
+        return '-';
+    }
+    $day = date('Y-m-d', $ts);
+    if ($day === date('Y-m-d')) {
+        return 'Hari ini, ' . date('H:i', $ts) . ' WIB';
+    }
+    if ($day === date('Y-m-d', strtotime('-1 day'))) {
+        return 'Kemarin, ' . date('H:i', $ts) . ' WIB';
+    }
+    return date('d M Y, H:i', $ts) . ' WIB';
+}
+
 function ticket_code(int $id): string
 {
     return 'VT-' . str_pad((string) $id, 4, '0', STR_PAD_LEFT);

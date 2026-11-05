@@ -137,16 +137,42 @@ foreach ($logs as $k => &$l) {
 }
 unset($l);
 
+$forumPosts = [
+    [
+        'id'         => 1,
+        'user_id'    => 1,
+        'subject'    => 'Jadwal sinkronisasi deployment staging pekan ini',
+        'message'    => 'Seluruh patch untuk layanan Customer Portal dan Payment API Gateway dijadwalkan naik ke environment staging setiap pukul 16:00 WIB sebelum verifikasi ulang.',
+        'created_at' => $ago(26),
+    ],
+    [
+        'id'         => 2,
+        'user_id'    => 3,
+        'subject'    => 'Update perbaikan VT-0001 pada endpoint cetak PDF invoice',
+        'message'    => 'Validasi kepemilikan objek sudah diperluas ke controller unduhan PDF. Sedang disiapkan unit test tambahan sebelum diajukan ulang ke tahap Re-test.',
+        'created_at' => $ago(4),
+    ],
+    [
+        'id'         => 3,
+        'user_id'    => 2,
+        'subject'    => 'Prioritas verifikasi VT-0002 (SQL Injection Customer Portal)',
+        'message'    => 'PR #88 sudah masuk antrean pengujian ulang sore ini. Mohon pastikan konfigurasi koneksi database di staging sudah menggunakan akun uji terbaru.',
+        'created_at' => $ago(1.5),
+    ],
+];
+
 return [
     'counters' => [
         'assets'            => count($assets),
         'vulnerabilities'   => count($vulns),
         'remediation_notes' => $noteId,
         'audit_logs'        => count($logs),
+        'forum_posts'       => count($forumPosts),
     ],
     'assets'            => $assets,
     'vulnerabilities'   => $vulns,
     'remediation_notes' => $notes,
     'audit_logs'        => $logs,
+    'forum_posts'       => $forumPosts,
 ];
 

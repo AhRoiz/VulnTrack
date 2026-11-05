@@ -41,10 +41,11 @@ require VIEW_PATH . '/layout/navbar.php';
 </nav>
 
 <div class="vt-page-header">
-    <div>
-        <h1 class="fw-bold mb-0">Laporkan Celah Keamanan</h1>
-        <p class="vt-page-subtitle">Lengkapi detail temuan dan tentukan skor keparahan melalui kalkulator CVSS v3.1.</p>
-    </div>
+    <h1 class="fw-bold mb-0">Tiket Baru</h1>
+    <a href="guide.php#headingCvss" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-question-circle" aria-hidden="true"></i>
+        <span>Panduan CVSS</span>
+    </a>
 </div>
 
 <form method="post" action="create_ticket.php" enctype="multipart/form-data" id="ticketForm" novalidate>
@@ -171,10 +172,6 @@ require VIEW_PATH . '/layout/navbar.php';
                             </div>
                         </fieldset>
                     <?php endforeach; ?>
-
-                    <div class="small text-secondary mt-3">
-                        Skor final dihitung ulang di server. Target SLA: Critical 24 jam, High 72 jam, Medium 7 hari, Low 14 hari.
-                    </div>
                 </div>
                 <div class="card-footer bg-white border-top py-3">
                     <button type="submit" class="btn btn-primary w-100" id="submitBtn">

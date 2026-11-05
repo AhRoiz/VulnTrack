@@ -1,35 +1,33 @@
-# Instruksi Refactoring UI/UX VulnTrack
+# Instruksi Revisi UI/UX VulnTrack (Iterasi 2) & Penambahan Fitur Forum
 
-Tolong rombak ulang seluruh antarmuka pengguna (UI) untuk aplikasi VulnTrack (halaman Login dan Dashboard). Saat ini desainnya terlalu berantakan, menggunakan tema gelap (dark mode) dengan warna neon/biru/ungu tipikal AI, terlalu banyak emoji, dan elemen card yang melayang tidak beraturan.
+Tolong lakukan *refactoring* kembali pada antarmuka VulnTrack (Login dan Dashboard) berdasarkan masukan terbaru, serta tambahkan satu fitur halaman baru untuk komunikasi tim. Desain sebelumnya masih terlalu rumit, terlalu banyak teks/penjelasan yang langsung ditampilkan, dan warnanya belum mencerminkan identitas aplikasi *cybersecurity* yang premium.
 
-Saya ingin desainnya diubah total menjadi **Light Theme (Putih Terang)** yang bersih, profesional, dan simpel, mengambil inspirasi dari struktur klasik seperti **AdminLTE**.
+Terapkan panduan desain dan spesifikasi fitur berikut:
 
-Gunakan framework CSS yang sudah ada di proyek (Tailwind/Bootstrap/Native), namun terapkan aturan gaya berikut:
+## 1. Simplifikasi Layout & Teks (Minimalisir "Clutter")
+*   **Hapus Teks Berlebihan:** Tampilan saat ini terlalu banyak kalimat panjang (terutama di halaman Login yang menampilkan "Alur Remediasi Wajib" secara gamblang).
+*   **Segmen Khusus Penjelasan:** Sembunyikan semua teks panjang, instruksi, atau penjelasan alur kerja. Pindahkan teks-teks tersebut ke dalam **Modal**, **Accordion**, atau **halaman/tab khusus "Bantuan & Panduan"**. Layar utama (Login & Dashboard) harus sebersih dan sesederhana mungkin, hanya berisi elemen operasional.
+*   **Copywriting:** Persingkat semua judul dan sub-judul. (Contoh: "Tata kelola remediasi celah keamanan internal terpusat" ubah menjadi sekadar "VulnTrack Login" atau hilangkan sama sekali jika tidak perlu).
 
-## 1. Panduan Gaya (Style Guide)
-*   **Tema Utama:** Light Mode. Gunakan warna latar belakang abu-abu sangat terang (misal: `#f4f6f9` atau `bg-gray-50`) untuk *body*, dan putih bersih (`#ffffff` atau `bg-white`) untuk area konten/card.
-*   **Hapus Warna Neon:** Hilangkan semua warna biru/ungu neon atau gradien yang berlebihan. 
-*   **Warna Aksen Klasik:** Untuk status atau metrik, gunakan warna *flat* yang solid (Biru untuk Info, Hijau untuk Sukses/Aman, Kuning/Oranye untuk Peringatan, Merah untuk Kritis/Danger).
-*   **Tipografi & Ikon:**
-    *   HAPUS semua penggunaan emoji sebagai ikon.
-    *   Ganti dengan ikon vektor minimalis (seperti Heroicons, FontAwesome, atau Lucide).
-    *   Gunakan font sans-serif yang bersih (seperti Inter, Roboto, atau sistem default) dengan hierarki teks yang jelas (ukuran dan ketebalan).
-*   **Card & Kontainer:** 
-    *   Hapus efek melayang (*heavy drop shadow*) dan garis batas samping (side-borders) tebal berwarna.
-    *   Gunakan card dengan border abu-abu tipis (`border-gray-200`) dan *shadow* yang sangat halus/tipis, atau desain *flat* seutuhnya.
+## 2. Pembaruan Tema Warna (Cybersecurity Corporate Style)
+*   **Warna Utama (Aksen):** Ganti dominasi warna biru dengan **Oranye Kemerahan** (terinspirasi dari *brand* seperti Cloudflare, Palo Alto, atau CrowdStrike). Contoh hex code yang bisa dipakai: `#F38020` (Oranye Cloudflare) atau `#F04E23` (Merah-Oranye Palo Alto).
+*   **Warna Latar & Netral:** Gunakan latar belakang putih bersih (`#ffffff`) atau abu-abu sangat muda (`#f8f9fa`). Jangan gunakan warna yang terlalu mencolok (hindari neon).
+*   **Warna Teks:** Gunakan abu-abu gelap/slate (seperti `#334155` atau `#1e293b`) alih-alih hitam pekat agar lebih nyaman dibaca.
+*   **Visual Mute:** Pertahankan *flat design*, shadow sangat tipis, dan garis batas yang lembut. Antarmuka harus terasa "dingin" dan sangat profesional, dengan aksen oranye hanya pada tombol utama atau indikator penting.
 
-## 2. Redesain Halaman Dashboard
-*   **Struktur Layout:** Buat layout klasik dengan *Sidebar* di kiri (bisa menggunakan warna gelap solid seperti `#222d32` atau putih bersih) dan *Top Navbar* yang rapi.
-*   **Metrik/KPI Cards:** Buat berjejer rapi di atas (seperti gaya AdminLTE). Setiap card memiliki warna solid yang mencerminkan statusnya, atau latar putih dengan ikon dan teks berwarna solid. Jangan buat tumpang tindih.
-*   **Tabel & Grafik:** Letakkan di dalam *box/card* putih bergaris batas tipis. Pastikan jarak (padding/margin) antar elemen lega dan tidak sumpek.
+## 3. Penambahan Fitur Baru: "Team Discussion / Forum"
+Tambahkan satu komponen/halaman baru bernama **"Forum Diskusi"** (atau "Team Chat") yang dapat diakses oleh semua *role* untuk saling memberikan *update*.
+*   **Struktur Visual Forum:** Harus berwujud seperti papan diskusi profesional atau *feed* obrolan bergaya korporat.
+*   **Data yang Wajib Ditampilkan per Pesan/Thread:**
+    *   **Subjek / Topik Diskusi** (Dicetak tebal/jelas).
+    *   **Nama Pengirim** (Misal: Admin, Security Analyst).
+    *   **Email Pengirim** (Ditampilkan lebih kecil/redup di sebelah nama).
+    *   **Waktu Pengiriman** (Timestamp, misal: "Hari ini, 14:30 WIB").
+    *   **Isi Pesan/Update**.
+*   **Interaksi:** Tambahkan form sederhana di bagian atas atau bawah forum untuk "Buat Diskusi Baru" (berisi input *Subjek* dan textarea *Isi Pesan*). *(Cukup buatkan UI mock-nya saja untuk sekarang jika backend belum siap)*.
 
-## 3. Redesain Halaman Login
-*   **Layout:** Gunakan layout *split-screen* (dua kolom) atau satu *box* bersih di tengah layar.
-*   **Visual:** Sisi kiri (jika split-screen) bisa menggunakan warna solid atau ilustrasi datar/minimalis (bukan roket neon/ungu, gunakan warna biru korporat atau putih bersih).
-*   **Form:** Sisi kanan khusus form login dengan latar putih bersih. Input field harus memiliki border abu-abu yang jelas, tanpa bayangan melayang. Tombol login gunakan warna solid (contoh: biru korporat).
-
-## Ringkasan DOs & DON'Ts untuk Agen:
-*   **DO:** Gunakan latar putih/abu-abu terang, gunakan ikon vektor, buat border tipis, perhatikan *whitespace*, gunakan warna flat standar untuk label status.
-*   **DON'T:** Jangan gunakan emoji, jangan gunakan warna neon, jangan buat card melayang/glowing, jangan gunakan dark mode.
-
-Tolong berikan *update* kodenya secara bertahap, mulai dari layout utama (Header/Sidebar/Body), lalu komponen Dashboard, dan terakhir Login.
+## Urutan Pengerjaan untuk Agen:
+1.  **Update Config/CSS Variables:** Ubah skema warna utama menjadi Oranye/Kemerahan.
+2.  **Refactor Login.php:** Bersihkan teks yang panjang, jadikan form login sangat minimalis di tengah layar (atau split screen yang bersih).
+3.  **Refactor Dashboard.php:** Persingkat teks, ubah warna badge/tombol agar selaras dengan tema baru.
+4.  **Buat Halaman/Komponen Forum:** Buat UI untuk halaman obrolan/diskusi sesuai spesifikasi di poin 3.
