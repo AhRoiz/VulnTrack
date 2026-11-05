@@ -19,7 +19,7 @@ final class JsonStore
         }
     }
 
-    /** Membaca seluruh data (shared lock). */
+    /** Membaca seluruh data dengan shared lock agar tidak membaca file yang sedang ditulis. */
     public function read(): array
     {
         $fp = fopen($this->file, 'rb');
@@ -36,14 +36,13 @@ final class JsonStore
         return $this->decode((string) $raw);
     }
 
-    /** Ambil satu koleksi. */
     public function collection(string $name): array
     {
         return $this->read()[$name] ?? [];
     }
 
     /**
-     * Menjalankan perubahan data secara atomik (exclusive lock).
+     * Menjalankan perubahan data secara atomik dengan exclusive lock (flock LOCK_EX).
      * Callback menerima data by-reference dan boleh mengembalikan nilai apa pun.
      */
     public function transaction(callable $callback): mixed
@@ -69,7 +68,6 @@ final class JsonStore
         return $result;
     }
 
-    /** Menghasilkan ID auto-increment untuk koleksi tertentu. */
     public static function nextId(array &$data, string $collection): int
     {
         $data['counters'][$collection] = ($data['counters'][$collection] ?? 0) + 1;
@@ -89,7 +87,6 @@ final class JsonStore
         return $data;
     }
 
-    /** Membuat file data awal beserta contoh data (seed). */
     private function seed(): void
     {
         if (!is_dir(dirname($this->file))) {

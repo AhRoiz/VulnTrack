@@ -1,8 +1,4 @@
 <?php
-/**
- * Bootstrap aplikasi: konfigurasi, autoload, session, security headers, service container sederhana.
- * Di-include di awal setiap halaman pada folder /public.
- */
 
 declare(strict_types=1);
 
@@ -18,7 +14,6 @@ spl_autoload_register(function (string $class): void {
     }
 });
 
-// ---- Session hardening ----
 if (session_status() !== PHP_SESSION_ACTIVE) {
     ini_set('session.use_strict_mode', '1');
     ini_set('session.use_only_cookies', '1');
@@ -33,28 +28,32 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
 
-// ---- Security headers ----
 header('X-Frame-Options: DENY');
 header('X-Content-Type-Options: nosniff');
 header('Referrer-Policy: strict-origin-when-cross-origin');
 
-// ---- Service container sederhana ----
-function store(): JsonStore
-{
-    static $store = null;
-    return $store ??= new JsonStore(DATA_FILE);
+if (!function_exists('store')) {
+    function store(): JsonStore
+    {
+        static $store = null;
+        return $store ??= new JsonStore(DATA_FILE);
+    }
 }
 
-function vulns(): VulnerabilityService
-{
-    static $svc = null;
-    return $svc ??= new VulnerabilityService(store());
+if (!function_exists('vulns')) {
+    function vulns(): VulnerabilityService
+    {
+        static $svc = null;
+        return $svc ??= new VulnerabilityService(store());
+    }
 }
 
-function assets(): AssetRepository
-{
-    static $repo = null;
-    return $repo ??= new AssetRepository(store());
+if (!function_exists('assets')) {
+    function assets(): AssetRepository
+    {
+        static $repo = null;
+        return $repo ??= new AssetRepository(store());
+    }
 }
 
 // Sinkronisasi data ke $_SESSION['vulnerabilities'] sesuai spesifikasi Checkpoint 1

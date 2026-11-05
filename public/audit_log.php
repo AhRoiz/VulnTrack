@@ -1,67 +1,74 @@
 <?php
-/**
- * Audit Log (append-only / immutable). Developer hanya melihat log tiket miliknya.
- */
-require __DIR__ . '/../app/bootstrap.php';
+require_once __DIR__ . '/../app/bootstrap.php';
 
 $user = Auth::requireLogin();
 
-// ---------- Data ----------
 $logs = vulns()->logsVisibleTo($user);
 $titles = array_column(vulns()->all(), 'title', 'id');
 
-// ---------- Tampilan ----------
 $pageTitle = 'Audit Log';
 require VIEW_PATH . '/layout/header.php';
 require VIEW_PATH . '/layout/navbar.php';
 ?>
-<div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-4">
+<div class="vt-page-header">
     <div>
-        <div class="vt-eyebrow text-muted small fw-semibold text-uppercase">Compliance</div>
-        <h1 class="h3 fw-bold mb-0">Audit Log</h1>
-        <p class="text-muted small mb-0"><i class="bi bi-lock-fill me-1"></i>Catatan bersifat immutable — tidak dapat diubah atau dihapus.</p>
+        <h1 class="fw-bold mb-0">Audit Log</h1>
+        <p class="vt-page-subtitle">
+            <i class="bi bi-lock-fill me-1" aria-hidden="true"></i>Rekam jejak bersifat tetap (append-only): setiap perubahan status tiket tercatat permanen dan tidak dapat dihapus.
+        </p>
     </div>
 </div>
 
 <div class="card vt-card">
     <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle js-datatable vt-table w-100" data-order-col="0" data-order-dir="desc">
-                <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Waktu</th>
-                    <th>Tiket</th>
-                    <th>Pengguna</th>
-                    <th>Aksi</th>
-                    <th>Perubahan Status</th>
-                </tr>
-                </thead>
-                <tbody>
-                <?php foreach ($logs as $l): $actor = Auth::findUser((int) $l['user_id']); ?>
+        <?php if (empty($logs)): ?>
+            <div class="vt-empty-state">
+                <div class="vt-empty-icon"><i class="bi bi-journal-text" aria-hidden="true"></i></div>
+                <h2 class="h6 fw-semibold mb-1">Belum ada aktivitas audit</h2>
+                <p class="small mb-0">Perubahan status tiket akan tercatat otomatis di halaman ini.</p>
+            </div>
+        <?php else: ?>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle js-datatable vt-table w-100" data-order-col="0" data-order-dir="desc">
+                    <thead>
                     <tr>
-                        <td class="vt-mono text-muted"><?= (int) $l['id'] ?></td>
-                        <td class="small text-nowrap" data-order="<?= e($l['timestamp']) ?>"><?= e(fmt_date($l['timestamp'], 'd M Y, H:i:s')) ?></td>
-                        <td>
-                            <a href="detail_ticket.php?id=<?= (int) $l['vulnerability_id'] ?>" class="vt-mono fw-semibold text-decoration-none"><?= e(ticket_code((int) $l['vulnerability_id'])) ?></a>
-                            <div class="small text-muted text-truncate" style="max-width: 260px"><?= e($titles[$l['vulnerability_id']] ?? '') ?></div>
-                        </td>
-                        <td class="small">
-                            <?= e($actor['name'] ?? '-') ?><br><?= $actor ? role_badge($actor['role']) : '' ?>
-                        </td>
-                        <td class="small"><?= e($l['action']) ?></td>
-                        <td class="text-nowrap">
-                            <?php if ($l['old_status'] !== null): ?>
-                                <?= status_badge($l['old_status']) ?> <i class="bi bi-arrow-right mx-1 text-muted"></i>
-                            <?php endif; ?>
-                            <?= status_badge((string) $l['new_status']) ?>
-                        </td>
+                        <th>ID</th>
+                        <th>Waktu</th>
+                        <th>Tiket</th>
+                        <th>Pelaksana</th>
+                        <th>Tindakan</th>
+                        <th>Transisi Status</th>
                     </tr>
-                <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody>
+                    <?php foreach ($logs as $l): $actor = Auth::findUser((int) $l['user_id']); ?>
+                        <tr>
+                            <td class="vt-mono text-secondary"><?= (int) $l['id'] ?></td>
+                            <td class="small text-nowrap" data-order="<?= e($l['timestamp']) ?>"><?= e(fmt_date($l['timestamp'], 'd M Y, H:i:s')) ?></td>
+                            <td>
+                                <a href="detail_ticket.php?id=<?= (int) $l['vulnerability_id'] ?>" class="vt-mono fw-semibold text-decoration-none">
+                                    <?= e(ticket_code((int) $l['vulnerability_id'])) ?>
+                                </a>
+                                <div class="small text-secondary text-truncate" style="max-width: 260px"><?= e($titles[$l['vulnerability_id']] ?? '') ?></div>
+                            </td>
+                            <td class="small">
+                                <div class="fw-medium"><?= e($actor['name'] ?? '-') ?></div>
+                                <div class="mt-1"><?= $actor ? role_badge($actor['role']) : '' ?></div>
+                            </td>
+                            <td class="small"><?= e($l['action']) ?></td>
+                            <td class="text-nowrap">
+                                <?php if ($l['old_status'] !== null): ?>
+                                    <?= status_badge($l['old_status']) ?>
+                                    <i class="bi bi-arrow-right mx-1 text-secondary" aria-hidden="true"></i>
+                                <?php endif; ?>
+                                <?= status_badge((string) $l['new_status']) ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php endif; ?>
     </div>
 </div>
 <?php require VIEW_PATH . '/layout/footer.php'; ?>
-

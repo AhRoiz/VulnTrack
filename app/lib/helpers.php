@@ -1,7 +1,4 @@
 <?php
-/**
- * Helper global (escaping, redirect, flash message, badge UI, dsb).
- */
 
 declare(strict_types=1);
 
@@ -78,7 +75,18 @@ function ticket_code(int $id): string
     return 'VT-' . str_pad((string) $id, 4, '0', STR_PAD_LEFT);
 }
 
-/* ---------------------------- Badge UI ---------------------------- */
+function filter_url(array $overrides = [], ?array $base = null): string
+{
+    $base ??= $_GET;
+    $merged = array_merge($base, $overrides);
+    $clean = [];
+    foreach ($merged as $k => $v) {
+        if ($v !== '' && $v !== null && $v !== false) {
+            $clean[$k] = (string) $v;
+        }
+    }
+    return empty($clean) ? 'vulnerabilities.php' : 'vulnerabilities.php?' . http_build_query($clean);
+}
 
 function severity_class(string $severity): string
 {
@@ -111,16 +119,22 @@ function status_badge(string $status): string
 function sla_badge(array $vuln): string
 {
     $s = Sla::status($vuln);
-    $text = $s['class'] === 'warning' ? 'text-dark' : '';
-    return '<span class="badge bg-' . $s['class'] . ' ' . $text . '" title="' . e($s['remaining']) . '">' . e($s['label']) . '</span>';
+    $cls = match ($s['key']) {
+        'overdue'  => 'sla-overdue',
+        'due_soon' => 'sla-due-soon',
+        'on_track' => 'sla-on-track',
+        'met'      => 'sla-met',
+        default    => 'sla-breached',
+    };
+    return '<span class="badge ' . $cls . '" title="' . e($s['remaining']) . '">' . e($s['label']) . '</span>';
 }
 
 function role_badge(string $role): string
 {
     $cls = match ($role) {
-        'admin'   => 'bg-dark',
-        'analyst' => 'bg-primary',
-        default   => 'bg-success',
+        'admin'   => 'role-admin',
+        'analyst' => 'role-analyst',
+        default   => 'role-developer',
     };
     return '<span class="badge ' . $cls . '">' . e(Auth::roleLabel($role)) . '</span>';
 }
@@ -128,9 +142,9 @@ function role_badge(string $role): string
 function env_badge(string $env): string
 {
     $cls = match ($env) {
-        'production' => 'bg-danger-subtle text-danger-emphasis border border-danger-subtle',
-        'staging'    => 'bg-warning-subtle text-warning-emphasis border border-warning-subtle',
-        default      => 'bg-info-subtle text-info-emphasis border border-info-subtle',
+        'production' => 'env-production',
+        'staging'    => 'env-staging',
+        default      => 'env-development',
     };
     return '<span class="badge ' . $cls . '">' . e(ucfirst($env)) . '</span>';
 }

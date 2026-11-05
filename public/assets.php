@@ -1,12 +1,8 @@
 <?php
-/**
- * Manajemen Aset (khusus Admin).
- */
-require __DIR__ . '/../app/bootstrap.php';
+require_once __DIR__ . '/../app/bootstrap.php';
 
 $user = Auth::requireRole('admin');
 
-// ---------- Pemrosesan form ----------
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     Csrf::verify();
     try {
@@ -19,7 +15,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     redirect('assets.php');
 }
 
-// ---------- Data ----------
 [$old, $errors] = pull_old_input();
 $assetList = assets()->all();
 $countByAsset = array_count_values(array_map(fn ($v) => (int) $v['asset_id'], vulns()->all()));
@@ -28,63 +23,86 @@ $openByAsset = array_count_values(array_map(
     array_filter(vulns()->all(), fn ($v) => $v['status'] !== 'Closed')
 ));
 
-// ---------- Tampilan ----------
-$pageTitle = 'Aset';
+$pageTitle = 'Manajemen Aset';
 require VIEW_PATH . '/layout/header.php';
 require VIEW_PATH . '/layout/navbar.php';
 ?>
-<div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-4">
+<div class="vt-page-header">
     <div>
-        <div class="vt-eyebrow text-muted small fw-semibold text-uppercase">Asset Inventory</div>
-        <h1 class="h3 fw-bold mb-0">Aset</h1>
+        <h1 class="fw-bold mb-0">Manajemen Aset</h1>
+        <p class="vt-page-subtitle">Daftar aplikasi, layanan API, dan environment yang menjadi cakupan pengujian keamanan.</p>
     </div>
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#assetModal"><i class="bi bi-plus-lg me-1"></i>Tambah Aset</button>
+    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#assetModal">
+        <i class="bi bi-plus-lg" aria-hidden="true"></i>
+        <span>Tambah Aset</span>
+    </button>
 </div>
 
 <div class="card vt-card">
     <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle js-datatable vt-table w-100" data-order-col="0" data-order-dir="asc">
-                <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Nama Aset</th>
-                    <th>Environment</th>
-                    <th>Deskripsi</th>
-                    <th class="text-center">Temuan Aktif</th>
-                    <th class="text-center">Total Temuan</th>
-                </tr>
-                </thead>
-                <tbody>
-                <?php foreach ($assetList as $a): ?>
+        <?php if (empty($assetList)): ?>
+            <div class="vt-empty-state">
+                <div class="vt-empty-icon"><i class="bi bi-hdd-network" aria-hidden="true"></i></div>
+                <h2 class="h6 fw-semibold mb-1">Belum ada aset terdaftar</h2>
+                <p class="small mb-3">Tambahkan aset sistem terlebih dahulu sebelum membuat laporan kerentanan.</p>
+                <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#assetModal">
+                    <i class="bi bi-plus-lg" aria-hidden="true"></i>
+                    <span>Tambah Aset Pertama</span>
+                </button>
+            </div>
+        <?php else: ?>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle js-datatable vt-table w-100" data-order-col="0" data-order-dir="asc">
+                    <thead>
                     <tr>
-                        <td class="vt-mono"><?= (int) $a['id'] ?></td>
-                        <td class="fw-semibold"><?= e($a['asset_name']) ?></td>
-                        <td><?= env_badge($a['environment']) ?></td>
-                        <td class="small text-muted"><?= e($a['description']) ?></td>
-                        <td class="text-center"><span class="badge <?= ($openByAsset[$a['id']] ?? 0) > 0 ? 'text-bg-danger' : 'text-bg-light' ?>"><?= (int) ($openByAsset[$a['id']] ?? 0) ?></span></td>
-                        <td class="text-center"><?= (int) ($countByAsset[$a['id']] ?? 0) ?></td>
+                        <th>ID</th>
+                        <th>Nama Aset</th>
+                        <th>Environment</th>
+                        <th>Deskripsi</th>
+                        <th class="text-center">Temuan Aktif</th>
+                        <th class="text-center">Total Temuan</th>
                     </tr>
-                <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody>
+                    <?php foreach ($assetList as $a): ?>
+                        <tr>
+                            <td class="vt-mono"><?= (int) $a['id'] ?></td>
+                            <td class="fw-semibold"><?= e($a['asset_name']) ?></td>
+                            <td><?= env_badge($a['environment']) ?></td>
+                            <td class="small text-secondary"><?= e($a['description']) ?></td>
+                            <td class="text-center">
+                                <span class="badge <?= ($openByAsset[$a['id']] ?? 0) > 0 ? 'sev-critical' : 'sev-none' ?>">
+                                    <?= (int) ($openByAsset[$a['id']] ?? 0) ?>
+                                </span>
+                            </td>
+                            <td class="text-center vt-mono"><?= (int) ($countByAsset[$a['id']] ?? 0) ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php endif; ?>
     </div>
 </div>
 
-<!-- Modal tambah aset -->
 <div class="modal fade" id="assetModal" tabindex="-1" aria-labelledby="assetModalLabel" aria-hidden="true" data-open-on-load="<?= $errors ? '1' : '0' ?>">
     <div class="modal-dialog modal-dialog-centered">
         <form method="post" action="assets.php" class="modal-content" novalidate>
             <?= Csrf::field() ?>
             <div class="modal-header">
-                <h2 class="modal-title h5" id="assetModalLabel"><i class="bi bi-hdd-network me-2"></i>Tambah Aset</h2>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                <h2 class="modal-title h5" id="assetModalLabel">Tambah Aset Baru</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup dialog"></button>
             </div>
             <div class="modal-body">
                 <div class="mb-3">
                     <label for="asset_name" class="form-label small fw-semibold">Nama Aset <span class="text-danger">*</span></label>
-                    <input type="text" name="asset_name" id="asset_name" maxlength="100" class="form-control<?= invalid($errors, 'asset_name') ?>" value="<?= e($old['asset_name'] ?? '') ?>">
+                    <input type="text"
+                           name="asset_name"
+                           id="asset_name"
+                           maxlength="100"
+                           class="form-control<?= invalid($errors, 'asset_name') ?>"
+                           placeholder="Contoh: Payment API Gateway"
+                           value="<?= e($old['asset_name'] ?? '') ?>">
                     <?= field_error($errors, 'asset_name') ?>
                 </div>
                 <div class="mb-3">
@@ -98,16 +116,20 @@ require VIEW_PATH . '/layout/navbar.php';
                 </div>
                 <div>
                     <label for="asset_desc" class="form-label small fw-semibold">Deskripsi</label>
-                    <textarea name="description" id="asset_desc" rows="3" maxlength="500" class="form-control<?= invalid($errors, 'description') ?>"><?= e($old['description'] ?? '') ?></textarea>
+                    <textarea name="description"
+                              id="asset_desc"
+                              rows="3"
+                              maxlength="500"
+                              class="form-control<?= invalid($errors, 'description') ?>"
+                              placeholder="Fungsi layanan atau domain terkait..."><?= e($old['description'] ?? '') ?></textarea>
                     <?= field_error($errors, 'description') ?>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
                 <button type="submit" class="btn btn-primary">Simpan Aset</button>
             </div>
         </form>
     </div>
 </div>
 <?php require VIEW_PATH . '/layout/footer.php'; ?>
-

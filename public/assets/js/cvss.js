@@ -1,7 +1,3 @@
-/**
- * VulnTrack - Kalkulator CVSS v3.1 sisi klien (real-time).
- * Catatan: hanya untuk tampilan; server menghitung ulang skor final.
- */
 (function () {
     'use strict';
 
@@ -16,7 +12,7 @@
     const ORDER = ['AV', 'AC', 'PR', 'UI', 'S', 'C', 'I', 'A'];
     const SEV_CLASS = { Critical: 'sev-critical', High: 'sev-high', Medium: 'sev-medium', Low: 'sev-low', None: 'sev-none' };
 
-    /** Roundup sesuai Appendix A spesifikasi CVSS v3.1 (menghindari error floating point). */
+    // Pembulatan ke atas sesuai Appendix A CVSS v3.1 tanpa galat floating-point.
     function roundUp(value) {
         const int = Math.round(value * 100000);
         return int % 10000 === 0 ? int / 100000 : (Math.floor(int / 10000) + 1) / 10;
@@ -71,7 +67,7 @@
 
     function render() {
         const m = readMetrics();
-        if (!m) return;
+        if (!m || !els.score) return;
 
         const score = calculate(m);
         const sev = severity(score);
@@ -82,14 +78,12 @@
         els.sev.className = 'badge fs-6 ' + cls;
         els.circle.className = 'vt-score-circle ' + cls;
         els.vector.textContent = 'CVSS:3.1/' + ORDER.map((k) => k + ':' + m[k]).join('/');
-        els.sla.textContent = slaHours[sev] ? formatDeadline(slaHours[sev]) : 'Tidak valid — pilih dampak C/I/A';
+        els.sla.textContent = slaHours[sev] ? formatDeadline(slaHours[sev]) : 'Pilih minimal satu dampak C/I/A';
         els.submit.disabled = score <= 0;
     }
 
     document.querySelectorAll('input.js-cvss').forEach((el) => el.addEventListener('change', render));
     render();
 
-    // Expose untuk pengujian di console
     window.VulnTrackCvss = { calculate, severity, roundUp };
 })();
-

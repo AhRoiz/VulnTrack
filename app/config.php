@@ -1,7 +1,4 @@
 <?php
-/**
- * VulnTrack - Konfigurasi aplikasi (Checkpoint 1 - tanpa database).
- */
 
 declare(strict_types=1);
 
@@ -16,8 +13,7 @@ define('STORAGE_PATH', BASE_PATH . '/storage');
 define('DATA_FILE', STORAGE_PATH . '/data.json');
 define('UPLOAD_PATH', STORAGE_PATH . '/uploads');
 
-// Batas & whitelist unggahan PoC
-define('POC_MAX_BYTES', 2 * 1024 * 1024); // 2 MB
+define('POC_MAX_BYTES', 2 * 1024 * 1024);
 define('POC_ALLOWED', [
     'png'  => 'image/png',
     'jpg'  => 'image/jpeg',
@@ -26,7 +22,7 @@ define('POC_ALLOWED', [
     'txt'  => 'text/plain',
 ]);
 
-// SLA (dalam jam) berdasarkan severity - sesuai konteks.md
+// Target SLA dalam jam per severity (Critical: 24j, High: 72j, Medium: 7h, Low: 14h)
 define('SLA_HOURS', [
     'Critical' => 24,
     'High'     => 72,
@@ -34,7 +30,7 @@ define('SLA_HOURS', [
     'Low'      => 14 * 24,
 ]);
 
-// Daftar status (state-machine)
 define('STATUSES', ['Open', 'Triaged', 'In Remediation', 'Re-test', 'Closed']);
 define('SEVERITIES', ['Critical', 'High', 'Medium', 'Low']);
+
 

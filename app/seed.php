@@ -122,7 +122,7 @@ foreach ($defs as $i => [$title, $desc, $assetId, $vector, $createdAgo, $history
         'closed_at'    => $status === 'Closed' ? $updated : null,
     ];
 
-    $logs[] = ['id' => ++$logId, 'vulnerability_id' => $id, 'user_id' => 2, 'action' => "Tiket dibuat (CVSS {$score} – {$severity})", 'old_status' => null, 'new_status' => 'Open', 'timestamp' => $created];
+    $logs[] = ['id' => ++$logId, 'vulnerability_id' => $id, 'user_id' => 2, 'action' => "Tiket dibuat (CVSS {$score}, {$severity})", 'old_status' => null, 'new_status' => 'Open', 'timestamp' => $created];
     foreach ($history as [$action, $from, $to, $hAgo, $uid]) {
         $logs[] = ['id' => ++$logId, 'vulnerability_id' => $id, 'user_id' => $uid, 'action' => $action, 'old_status' => $from, 'new_status' => $to, 'timestamp' => $ago($hAgo)];
     }

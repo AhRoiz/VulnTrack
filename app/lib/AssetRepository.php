@@ -1,7 +1,4 @@
 <?php
-/**
- * AssetRepository - Data aset (aplikasi / server / environment yang diuji).
- */
 
 declare(strict_types=1);
 
@@ -28,7 +25,6 @@ final class AssetRepository
         return null;
     }
 
-    /** Peta id => asset untuk lookup cepat di view. */
     public function map(): array
     {
         return array_column($this->all(), null, 'id');
@@ -43,7 +39,7 @@ final class AssetRepository
 
         $errors = [];
         if (mb_strlen($name) < 3 || mb_strlen($name) > 100) {
-            $errors['asset_name'] = 'Nama aset wajib diisi (3–100 karakter).';
+            $errors['asset_name'] = 'Nama aset wajib diisi (3 sampai 100 karakter).';
         }
         if (!in_array($env, self::ENVIRONMENTS, true)) {
             $errors['environment'] = 'Environment tidak valid.';

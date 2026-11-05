@@ -3,7 +3,7 @@
  * Endpoint aksi state-machine tiket (POST only + CSRF).
  * Semua validasi role/status/kepemilikan dilakukan di server (Workflow + VulnerabilityService).
  */
-require __DIR__ . '/../app/bootstrap.php';
+require_once __DIR__ . '/../app/bootstrap.php';
 
 $user = Auth::requireLogin();
 require_post();

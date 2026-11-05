@@ -1,24 +1,27 @@
-/**
- * VulnTrack - Halaman login: toggle password & isi cepat akun demo.
- */
 (function () {
     'use strict';
 
-    const pwd = document.getElementById('password');
-    const toggle = document.getElementById('togglePassword');
+    const emailInput = document.getElementById('email');
+    const pwdInput = document.getElementById('password');
+    const toggleBtn = document.getElementById('togglePassword');
 
-    toggle?.addEventListener('click', () => {
-        const show = pwd.type === 'password';
-        pwd.type = show ? 'text' : 'password';
-        toggle.innerHTML = show ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
+    toggleBtn?.addEventListener('click', () => {
+        if (!pwdInput) return;
+        const show = pwdInput.type === 'password';
+        pwdInput.type = show ? 'text' : 'password';
+        toggleBtn.setAttribute('aria-pressed', show ? 'true' : 'false');
+        toggleBtn.setAttribute('aria-label', show ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi');
+        toggleBtn.innerHTML = show
+            ? '<i class="bi bi-eye-slash" aria-hidden="true"></i>'
+            : '<i class="bi bi-eye" aria-hidden="true"></i>';
     });
 
     document.querySelectorAll('.js-demo-login').forEach((btn) => {
         btn.addEventListener('click', () => {
-            document.getElementById('email').value = btn.dataset.email;
-            pwd.value = 'password123';
-            pwd.focus();
+            if (!emailInput || !pwdInput) return;
+            emailInput.value = btn.dataset.email || '';
+            pwdInput.value = 'password123';
+            pwdInput.focus();
         });
     });
 })();
-

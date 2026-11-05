@@ -1,7 +1,4 @@
 <?php
-/**
- * Auth - Autentikasi berbasis PHP Session + Role-Based Access Control (RBAC).
- */
 
 declare(strict_types=1);
 
@@ -19,13 +16,11 @@ final class Auth
         return $id !== null ? (self::users()[$id] ?? null) : null;
     }
 
-    /** Daftar user dengan role tertentu (mis. developer untuk dropdown assignee). */
     public static function usersByRole(string $role): array
     {
         return array_values(array_filter(self::users(), fn ($u) => $u['role'] === $role));
     }
 
-    /** Mencoba login. Mengembalikan true jika kredensial valid. */
     public static function attempt(string $email, string $password): bool
     {
         $email = strtolower(trim($email));
@@ -75,7 +70,6 @@ final class Auth
         return self::check() && in_array(self::user()['role'], $roles, true);
     }
 
-    /** Proteksi halaman: redirect ke login jika belum ada session. */
     public static function requireLogin(): array
     {
         if (!self::check()) {
@@ -85,7 +79,6 @@ final class Auth
         return self::user();
     }
 
-    /** Proteksi halaman berbasis role (RBAC). */
     public static function requireRole(string ...$roles): array
     {
         $user = self::requireLogin();

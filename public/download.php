@@ -13,7 +13,7 @@ if ($ticket === null || empty($ticket['poc_file']) || !vulns()->canView($ticket,
     abort(404, 'File PoC tidak ditemukan.');
 }
 
-// Nama file tersimpan dibuat sistem (hex acak) — tetap divalidasi untuk mencegah path traversal
+// Validasi format nama file acak sistem untuk mencegah path traversal.
 if (!preg_match('/^[a-f0-9]{32}\.(png|jpe?g|pdf|txt)$/', $ticket['poc_file'])) {
     abort(404, 'File PoC tidak valid.');
 }

@@ -1,7 +1,4 @@
 <?php
-/**
- * Csrf - Proteksi Cross-Site Request Forgery berbasis token session.
- */
 
 declare(strict_types=1);
 
@@ -20,7 +17,6 @@ final class Csrf
         return '<input type="hidden" name="_csrf" value="' . e(self::token()) . '">';
     }
 
-    /** Validasi token pada request POST; hentikan request jika tidak valid. */
     public static function verify(): void
     {
         $sent = $_POST['_csrf'] ?? '';
@@ -29,4 +25,5 @@ final class Csrf
         }
     }
 }
+
 

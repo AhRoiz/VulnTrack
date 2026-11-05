@@ -1,7 +1,4 @@
 <?php
-/**
- * Sla - Penentuan tenggat waktu & status pelacakan SLA.
- */
 
 declare(strict_types=1);
 
@@ -18,10 +15,7 @@ final class Sla
         return $from->modify('+' . self::hours($severity) . ' hours')->format('Y-m-d H:i:s');
     }
 
-    /**
-     * Status SLA sebuah tiket.
-     * @return array{key:string,label:string,class:string,remaining:string,seconds:int}
-     */
+    /** @return array{key:string,label:string,class:string,remaining:string,seconds:int} */
     public static function status(array $v): array
     {
         $deadline = strtotime($v['sla_deadline']);

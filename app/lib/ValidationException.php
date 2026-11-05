@@ -1,7 +1,4 @@
 <?php
-/**
- * ValidationException - membawa daftar error validasi per-field.
- */
 
 declare(strict_types=1);
 

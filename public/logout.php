@@ -1,8 +1,8 @@
 <?php
 /**
- * Logout (hanya via POST + CSRF agar tidak bisa dipicu lewat link/gambar pihak ketiga).
+ * Logout hanya menerima POST + CSRF agar tidak bisa dipicu lewat link atau gambar pihak ketiga.
  */
-require __DIR__ . '/../app/bootstrap.php';
+require_once __DIR__ . '/../app/bootstrap.php';
 
 require_post();
 Auth::logout();
