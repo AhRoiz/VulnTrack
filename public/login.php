@@ -42,25 +42,31 @@ $demoAccounts = [
 require VIEW_PATH . '/layout/header.php';
 ?>
 <div class="vt-login-shell">
-    <div class="vt-login-box">
-        <div class="vt-login-card">
-            <header class="d-flex align-items-center justify-content-between mb-4">
-                <div class="d-flex align-items-center gap-2">
-                    <span class="vt-logo" aria-hidden="true"><i class="bi bi-shield-check"></i></span>
-                    <h1 class="h5 fw-bold mb-0">VulnTrack Login</h1>
+    <div class="vt-login-wrapper">
+        <div class="vt-login-split">
+            <header class="vt-login-brand">
+                <div class="vt-login-brand-inner">
+                    <span class="vt-login-brand-logo" aria-hidden="true">
+                        <i class="bi bi-shield-check"></i>
+                    </span>
+                    <h1 class="vt-login-brand-title">VulnTrack</h1>
                 </div>
-                <nav aria-label="Bantuan sistem">
-                    <button type="button"
-                            class="btn btn-sm btn-outline-secondary"
-                            data-bs-toggle="modal"
-                            data-bs-target="#loginGuideModal">
-                        <i class="bi bi-question-circle" aria-hidden="true"></i>
-                        <span>Panduan</span>
-                    </button>
-                </nav>
             </header>
 
-            <main id="main-content">
+            <main id="main-content" class="vt-login-form-pane">
+                <div class="d-flex align-items-center justify-content-between gap-2 mb-4">
+                    <h2 class="h5 fw-bold mb-0">Masuk Akun</h2>
+                    <nav aria-label="Bantuan sistem">
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary"
+                                data-bs-toggle="modal"
+                                data-bs-target="#loginGuideModal">
+                            <i class="bi bi-question-circle" aria-hidden="true"></i>
+                            <span>Panduan</span>
+                        </button>
+                    </nav>
+                </div>
+
                 <?php if ($error): ?>
                     <div class="alert alert-danger d-flex align-items-center gap-2 py-2 small" role="alert">
                         <i class="bi bi-exclamation-octagon-fill" aria-hidden="true"></i>
@@ -105,7 +111,7 @@ require VIEW_PATH . '/layout/header.php';
 
                     <button type="submit" class="btn btn-primary w-100">
                         <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i>
-                        <span>Masuk ke Dashboard</span>
+                        <span>Masuk</span>
                     </button>
                 </form>
 
@@ -128,7 +134,7 @@ require VIEW_PATH . '/layout/header.php';
             </main>
         </div>
 
-        <footer class="text-center small text-secondary mt-3">
+        <footer class="vt-login-footer text-center small text-secondary mt-3">
             &copy; <?= date('Y') ?> <?= e(APP_NAME) ?> &middot; <span class="vt-mono">v<?= e(APP_VERSION) ?></span>
         </footer>
     </div>

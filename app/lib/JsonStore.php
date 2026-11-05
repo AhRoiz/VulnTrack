@@ -10,7 +10,7 @@ declare(strict_types=1);
 
 final class JsonStore
 {
-    private const COLLECTIONS = ['assets', 'vulnerabilities', 'remediation_notes', 'audit_logs', 'forum_posts'];
+    private const COLLECTIONS = ['assets', 'vulnerabilities', 'remediation_notes', 'audit_logs', 'forum_threads', 'forum_replies'];
 
     public function __construct(private string $file)
     {

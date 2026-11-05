@@ -14,7 +14,7 @@ $fullTitle = isset($pageTitle) && $pageTitle !== '' ? $pageTitle . ' | ' . APP_N
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/2.1.8/css/dataTables.bootstrap5.min.css" rel="stylesheet">
-    <link href="assets/css/app.css?v=<?= e(APP_VERSION) ?>-v2" rel="stylesheet">
+    <link href="assets/css/app.css?v=<?= e(APP_VERSION) ?>-v3" rel="stylesheet">
 </head>
 <body class="<?= e($bodyClass ?? '') ?>">
 <a href="#main-content" class="vt-skip-link">Langsung ke konten utama</a>

@@ -1,33 +1,25 @@
-# Instruksi Revisi UI/UX VulnTrack (Iterasi 2) & Penambahan Fitur Forum
+# Instruksi Revisi UI/UX VulnTrack (Iterasi 3) & Penambahan Fitur Forum
 
-Tolong lakukan *refactoring* kembali pada antarmuka VulnTrack (Login dan Dashboard) berdasarkan masukan terbaru, serta tambahkan satu fitur halaman baru untuk komunikasi tim. Desain sebelumnya masih terlalu rumit, terlalu banyak teks/penjelasan yang langsung ditampilkan, dan warnanya belum mencerminkan identitas aplikasi *cybersecurity* yang premium.
+Tolong lakukan *refactoring* kembali pada antarmuka VulnTrack (Login dan Dashboard). Desain sebelumnya terlalu polos dan kehilangan struktur aslinya, serta masih ada *bug* visual di komponen tabel. Terapkan spesifikasi berikut secara presisi:
 
-Terapkan panduan desain dan spesifikasi fitur berikut:
-
-## 1. Simplifikasi Layout & Teks (Minimalisir "Clutter")
-*   **Hapus Teks Berlebihan:** Tampilan saat ini terlalu banyak kalimat panjang (terutama di halaman Login yang menampilkan "Alur Remediasi Wajib" secara gamblang).
-*   **Segmen Khusus Penjelasan:** Sembunyikan semua teks panjang, instruksi, atau penjelasan alur kerja. Pindahkan teks-teks tersebut ke dalam **Modal**, **Accordion**, atau **halaman/tab khusus "Bantuan & Panduan"**. Layar utama (Login & Dashboard) harus sebersih dan sesederhana mungkin, hanya berisi elemen operasional.
-*   **Copywriting:** Persingkat semua judul dan sub-judul. (Contoh: "Tata kelola remediasi celah keamanan internal terpusat" ubah menjadi sekadar "VulnTrack Login" atau hilangkan sama sekali jika tidak perlu).
+## 1. Halaman Login (Minimalis, namun tetap Split-Screen)
+*   **Pertahankan Layout 2 Kolom (Split):** Jangan buat menjadi satu *card* polos di tengah. Pertahankan layout awal di mana layar atau *card* utama terbagi dua:
+    *   **Bagian Kiri (Branding):** Hanya berisi Logo dan Judul Aplikasi. Gunakan latar belakang warna utama aplikasi (atau variasi warnanya) dengan teks kontras. Pastikan sangat *clean*, hapus semua paragraf panjang dan poin-poin "Alur Remediasi".
+    *   **Bagian Kanan (Form Login):** Latar belakang putih bersih. Hanya berisi *input* Email, Password, tombol Login, dan tombol *auto-fill* (Akun Demo) yang ditata rapi.
+*   **Penempatan Penjelasan:** Jika ada teks panduan tambahan, letakkan di tombol kecil bertuliskan "Panduan" (bisa membuka *modal* atau tab baru), jangan diumbar di layar utama.
 
 ## 2. Pembaruan Tema Warna (Cybersecurity Corporate Style)
-*   **Warna Utama (Aksen):** Ganti dominasi warna biru dengan **Oranye Kemerahan** (terinspirasi dari *brand* seperti Cloudflare, Palo Alto, atau CrowdStrike). Contoh hex code yang bisa dipakai: `#F38020` (Oranye Cloudflare) atau `#F04E23` (Merah-Oranye Palo Alto).
-*   **Warna Latar & Netral:** Gunakan latar belakang putih bersih (`#ffffff`) atau abu-abu sangat muda (`#f8f9fa`). Jangan gunakan warna yang terlalu mencolok (hindari neon).
-*   **Warna Teks:** Gunakan abu-abu gelap/slate (seperti `#334155` atau `#1e293b`) alih-alih hitam pekat agar lebih nyaman dibaca.
-*   **Visual Mute:** Pertahankan *flat design*, shadow sangat tipis, dan garis batas yang lembut. Antarmuka harus terasa "dingin" dan sangat profesional, dengan aksen oranye hanya pada tombol utama atau indikator penting.
+*   **Warna Utama:** Gunakan warna **Oranye/Kemerahan** (mirip Cloudflare, CrowdStrike, atau Palo Alto). Gunakan hex seperti `#F38020` atau `#F04E23` sebagai aksen utama (untuk tombol utama, *badge* status aktif, atau elemen *highlight*).
+*   **Warna Netral:** Latar belakang halaman gunakan abu-abu sangat muda/putih bersih. Buat elemen *card* memiliki *shadow* yang sangat tipis dan halus (*soft flat design*). Jangan gunakan warna neon/mencolok.
 
-## 3. Penambahan Fitur Baru: "Team Discussion / Forum"
-Tambahkan satu komponen/halaman baru bernama **"Forum Diskusi"** (atau "Team Chat") yang dapat diakses oleh semua *role* untuk saling memberikan *update*.
-*   **Struktur Visual Forum:** Harus berwujud seperti papan diskusi profesional atau *feed* obrolan bergaya korporat.
-*   **Data yang Wajib Ditampilkan per Pesan/Thread:**
-    *   **Subjek / Topik Diskusi** (Dicetak tebal/jelas).
-    *   **Nama Pengirim** (Misal: Admin, Security Analyst).
-    *   **Email Pengirim** (Ditampilkan lebih kecil/redup di sebelah nama).
-    *   **Waktu Pengiriman** (Timestamp, misal: "Hari ini, 14:30 WIB").
-    *   **Isi Pesan/Update**.
-*   **Interaksi:** Tambahkan form sederhana di bagian atas atau bawah forum untuk "Buat Diskusi Baru" (berisi input *Subjek* dan textarea *Isi Pesan*). *(Cukup buatkan UI mock-nya saja untuk sekarang jika backend belum siap)*.
+## 3. Perbaikan Bug UI (Dashboard DataTables)
+*   **Fix Dropdown "Tampilkan [10] baris":** Terdapat *bug* CSS di mana angka pada *dropdown* (komponen `<select>` *length menu*) bertumpuk atau keluar dari batas garis kotaknya. Tolong perbaiki *padding*, *line-height*, atau *width* dari elemen `<select>` tersebut agar angkanya berada pas di tengah kotak tanpa memotong *border*.
 
-## Urutan Pengerjaan untuk Agen:
-1.  **Update Config/CSS Variables:** Ubah skema warna utama menjadi Oranye/Kemerahan.
-2.  **Refactor Login.php:** Bersihkan teks yang panjang, jadikan form login sangat minimalis di tengah layar (atau split screen yang bersih).
-3.  **Refactor Dashboard.php:** Persingkat teks, ubah warna badge/tombol agar selaras dengan tema baru.
-4.  **Buat Halaman/Komponen Forum:** Buat UI untuk halaman obrolan/diskusi sesuai spesifikasi di poin 3.
+## 4. Pengembangan Halaman "Forum Diskusi"
+Ubah konsep *chat* sederhana menjadi sistem **Forum** yang lebih terstruktur. Buat halaman atau komponen dengan spesifikasi berikut:
+*   **Hierarki Subforum:** Tampilkan daftar kategori diskusi di panel samping atau atas (Misal: "General Updates", "Patching Coordination", "SLA Warnings").
+*   **Threads (Topik):** Di dalam subforum, pengguna bisa membuat Thread/Topik baru.
+*   **Isi Thread:** Saat Thread dibuka, tampilkan subjek di atas, diikuti daftar balasan. Setiap balasan wajib menampilkan: **Nama Pengirim**, **Email/Role**, **Waktu (Timestamp)**, dan **Isi Pesan**.
+*   **Fitur "Subscribe":** Tambahkan tombol atau *toggle* **"Subscribe"** atau **"Ikuti Topik"** di dalam Thread. Berikan indikator visual (seperti ikon lonceng) bahwa pengguna akan mendapat notifikasi pembaruan dari topik tersebut. *(Cukup buatkan UI/UX-nya terlebih dahulu)*.
+
+**Catatan Eksekusi:** Mulailah dari membenarkan layout Login dan CSS *dropdown* tabel terlebih dahulu, baru kemudian buat rancangan komponen Forum.

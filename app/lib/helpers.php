@@ -168,6 +168,16 @@ function env_badge(string $env): string
     return '<span class="badge ' . $cls . '">' . e(ucfirst($env)) . '</span>';
 }
 
+function forum_category_badge(string $slug, string $name): string
+{
+    $cls = match ($slug) {
+        'patching-coordination' => 'cat-patching',
+        'sla-warnings'          => 'cat-sla',
+        default                 => 'cat-general',
+    };
+    return '<span class="badge ' . $cls . '">' . e($name) . '</span>';
+}
+
 /** Tampilkan pesan error validasi untuk sebuah field. */
 function field_error(array $errors, string $field): string
 {

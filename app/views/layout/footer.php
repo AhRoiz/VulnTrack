@@ -42,9 +42,9 @@ $withNavbar = $withNavbar ?? true;
 <?php if (!empty($useCharts)): ?>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <?php endif; ?>
-<script src="assets/js/app.js?v=<?= e(APP_VERSION) ?>-v2"></script>
+<script src="assets/js/app.js?v=<?= e(APP_VERSION) ?>-v3"></script>
 <?php foreach ($scripts ?? [] as $src): ?>
-<script src="<?= e($src) ?>?v=<?= e(APP_VERSION) ?>-v2"></script>
+<script src="<?= e($src) ?>?v=<?= e(APP_VERSION) ?>-v3"></script>
 <?php endforeach; ?>
 </body>
 </html>

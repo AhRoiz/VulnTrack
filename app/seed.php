@@ -137,27 +137,67 @@ foreach ($logs as $k => &$l) {
 }
 unset($l);
 
-$forumPosts = [
+$forumThreads = [
+    [
+        'id'             => 1,
+        'category'       => 'general-updates',
+        'user_id'        => 1,
+        'subject'        => 'Jadwal sinkronisasi deployment staging pekan ini',
+        'message'        => 'Seluruh patch untuk layanan Customer Portal dan Payment API Gateway dijadwalkan naik ke environment staging setiap pukul 16:00 WIB sebelum verifikasi ulang.',
+        'subscriber_ids' => [1, 2],
+        'created_at'     => $ago(28),
+        'updated_at'     => $ago(22),
+    ],
+    [
+        'id'             => 2,
+        'category'       => 'patching-coordination',
+        'user_id'        => 3,
+        'subject'        => 'Koordinasi perbaikan VT-0001 pada endpoint cetak PDF invoice',
+        'message'        => 'Validasi kepemilikan objek sudah diperluas ke controller unduhan PDF pada PR #212. Mohon konfirmasi apakah pengujian ulang memerlukan akun uji multi-tenant tambahan.',
+        'subscriber_ids' => [2, 3],
+        'created_at'     => $ago(8),
+        'updated_at'     => $ago(3),
+    ],
+    [
+        'id'             => 3,
+        'category'       => 'sla-warnings',
+        'user_id'        => 2,
+        'subject'        => 'Eskalasi SLA VT-0004 (Rate limiting verifikasi OTP) dan prioritas VT-0002',
+        'message'        => 'Tiket VT-0004 pada Mobile Backend API telah melewati tenggat SLA Medium, sementara VT-0002 (SQL Injection Customer Portal) berada di tahap Re-test dengan batas waktu Critical.',
+        'subscriber_ids' => [1, 2, 3],
+        'created_at'     => $ago(2.5),
+        'updated_at'     => $ago(1),
+    ],
+];
+
+$forumReplies = [
     [
         'id'         => 1,
-        'user_id'    => 1,
-        'subject'    => 'Jadwal sinkronisasi deployment staging pekan ini',
-        'message'    => 'Seluruh patch untuk layanan Customer Portal dan Payment API Gateway dijadwalkan naik ke environment staging setiap pukul 16:00 WIB sebelum verifikasi ulang.',
-        'created_at' => $ago(26),
+        'thread_id'  => 1,
+        'user_id'    => 2,
+        'message'    => 'Diterima. Tim analis menyiapkan skenario regresi autentikasi dan otorisasi invoice setiap selesai sinkronisasi sore.',
+        'created_at' => $ago(22),
     ],
     [
         'id'         => 2,
-        'user_id'    => 3,
-        'subject'    => 'Update perbaikan VT-0001 pada endpoint cetak PDF invoice',
-        'message'    => 'Validasi kepemilikan objek sudah diperluas ke controller unduhan PDF. Sedang disiapkan unit test tambahan sebelum diajukan ulang ke tahap Re-test.',
-        'created_at' => $ago(4),
+        'thread_id'  => 2,
+        'user_id'    => 2,
+        'message'    => 'Gunakan dua akun uji yang sudah ada di staging. Pastikan response saat akses lintas akun mengembalikan kode HTTP yang konsisten.',
+        'created_at' => $ago(5.5),
     ],
     [
         'id'         => 3,
-        'user_id'    => 2,
-        'subject'    => 'Prioritas verifikasi VT-0002 (SQL Injection Customer Portal)',
-        'message'    => 'PR #88 sudah masuk antrean pengujian ulang sore ini. Mohon pastikan konfigurasi koneksi database di staging sudah menggunakan akun uji terbaru.',
-        'created_at' => $ago(1.5),
+        'thread_id'  => 2,
+        'user_id'    => 3,
+        'message'    => 'Sudah disesuaikan agar mengembalikan HTTP 404 seragam seperti endpoint detail invoice. Unit test selesai dijalankan dan siap masuk antrean Re-test.',
+        'created_at' => $ago(3),
+    ],
+    [
+        'id'         => 4,
+        'thread_id'  => 3,
+        'user_id'    => 1,
+        'message'    => 'Prioritaskan penutupan verifikasi VT-0002 sore ini terlebih dahulu, lalu jadwalkan penerapan middleware rate limiter untuk VT-0004 pada sprint berjalan.',
+        'created_at' => $ago(1),
     ],
 ];
 
@@ -167,12 +207,14 @@ return [
         'vulnerabilities'   => count($vulns),
         'remediation_notes' => $noteId,
         'audit_logs'        => count($logs),
-        'forum_posts'       => count($forumPosts),
+        'forum_threads'     => count($forumThreads),
+        'forum_replies'     => count($forumReplies),
     ],
     'assets'            => $assets,
     'vulnerabilities'   => $vulns,
     'remediation_notes' => $notes,
     'audit_logs'        => $logs,
-    'forum_posts'       => $forumPosts,
+    'forum_threads'     => $forumThreads,
+    'forum_replies'     => $forumReplies,
 ];
 

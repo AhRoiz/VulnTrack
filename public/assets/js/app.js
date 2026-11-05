@@ -102,6 +102,10 @@
             if (searchInput && !searchInput.getAttribute('aria-label')) {
                 searchInput.setAttribute('aria-label', 'Cari cepat di tabel');
             }
+            const lengthSelect = container?.querySelector('.dt-length select');
+            if (lengthSelect && !lengthSelect.getAttribute('aria-label')) {
+                lengthSelect.setAttribute('aria-label', 'Jumlah baris per halaman');
+            }
         });
     }
 
