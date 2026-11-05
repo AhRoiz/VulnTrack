@@ -17,7 +17,7 @@ try {
     flash('success', $message);
 } catch (ValidationException $ex) {
     with_old_input($_POST, $ex->errors);
-    flash('danger', reset($ex->errors));
+    flash('danger', $ex->first());
 } catch (DomainException $ex) {
     flash('danger', $ex->getMessage());
 }

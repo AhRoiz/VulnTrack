@@ -57,3 +57,8 @@ function assets(): AssetRepository
     return $repo ??= new AssetRepository(store());
 }
 
+// Sinkronisasi data ke $_SESSION['vulnerabilities'] sesuai spesifikasi Checkpoint 1
+if (session_status() === PHP_SESSION_ACTIVE) {
+    $_SESSION['vulnerabilities'] = vulns()->all();
+}
+

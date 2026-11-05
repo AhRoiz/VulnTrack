@@ -11,5 +11,13 @@ final class ValidationException extends RuntimeException
     {
         parent::__construct($message);
     }
+
+    public function first(): string
+    {
+        foreach ($this->errors as $msg) {
+            return (string) $msg;
+        }
+        return $this->getMessage();
+    }
 }
 
