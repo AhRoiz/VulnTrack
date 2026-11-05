@@ -1,0 +1,11 @@
+# Data runtime (dibuat otomatis dari app/seed.php)
+/storage/data.json
+/storage/uploads/*
+!/storage/uploads/.gitkeep
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+

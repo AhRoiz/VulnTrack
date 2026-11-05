@@ -1,0 +1,3 @@
+# Tolak akses web langsung ke kode aplikasi
+Require all denied
+

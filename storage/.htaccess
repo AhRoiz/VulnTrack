@@ -1,0 +1,3 @@
+# Tolak akses web langsung ke data JSON & file PoC
+Require all denied
+
