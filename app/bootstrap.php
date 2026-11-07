@@ -32,11 +32,10 @@ header('X-Frame-Options: DENY');
 header('X-Content-Type-Options: nosniff');
 header('Referrer-Policy: strict-origin-when-cross-origin');
 
-if (!function_exists('store')) {
-    function store(): JsonStore
+if (!function_exists('db')) {
+    function db(): Database
     {
-        static $store = null;
-        return $store ??= new JsonStore(DATA_FILE);
+        return Database::instance();
     }
 }
 
@@ -44,7 +43,7 @@ if (!function_exists('vulns')) {
     function vulns(): VulnerabilityService
     {
         static $svc = null;
-        return $svc ??= new VulnerabilityService(store());
+        return $svc ??= new VulnerabilityService(db());
     }
 }
 
@@ -52,7 +51,7 @@ if (!function_exists('assets')) {
     function assets(): AssetRepository
     {
         static $repo = null;
-        return $repo ??= new AssetRepository(store());
+        return $repo ??= new AssetRepository(db());
     }
 }
 
@@ -60,12 +59,6 @@ if (!function_exists('forum')) {
     function forum(): ForumService
     {
         static $forum = null;
-        return $forum ??= new ForumService(store());
+        return $forum ??= new ForumService(db());
     }
 }
-
-// Sinkronisasi data ke $_SESSION['vulnerabilities'] sesuai spesifikasi Checkpoint 1
-if (session_status() === PHP_SESSION_ACTIVE) {
-    $_SESSION['vulnerabilities'] = vulns()->all();
-}
-

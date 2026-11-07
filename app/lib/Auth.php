@@ -8,43 +8,85 @@ final class Auth
 
     public static function users(): array
     {
-        return self::$users ??= require APP_PATH . '/users.php';
+        if (self::$users !== null) {
+            return self::$users;
+        }
+
+        $rows = db()->fetchAll('SELECT id, name, email, role FROM users WHERE is_active = 1 ORDER BY id ASC');
+        $indexed = [];
+        foreach ($rows as $row) {
+            $id = (int) $row['id'];
+            $indexed[$id] = [
+                'id'    => $id,
+                'name'  => (string) $row['name'],
+                'email' => (string) $row['email'],
+                'role'  => (string) $row['role'],
+            ];
+        }
+
+        return self::$users = $indexed;
     }
 
     public static function findUser(?int $id): ?array
     {
-        return $id !== null ? (self::users()[$id] ?? null) : null;
+        if ($id === null || $id <= 0) {
+            return null;
+        }
+
+        $cached = self::users();
+        if (isset($cached[$id])) {
+            return $cached[$id];
+        }
+
+        $row = db()->fetchOne('SELECT id, name, email, role FROM users WHERE id = :id LIMIT 1', ['id' => $id]);
+        if ($row === null) {
+            return null;
+        }
+
+        return self::$users[$id] = [
+            'id'    => (int) $row['id'],
+            'name'  => (string) $row['name'],
+            'email' => (string) $row['email'],
+            'role'  => (string) $row['role'],
+        ];
     }
 
     public static function usersByRole(string $role): array
     {
-        return array_values(array_filter(self::users(), fn ($u) => $u['role'] === $role));
+        $rows = db()->fetchAll(
+            'SELECT id, name, email, role FROM users WHERE role = :role AND is_active = 1 ORDER BY id ASC',
+            ['role' => $role]
+        );
+
+        return array_map(static fn (array $row): array => [
+            'id'    => (int) $row['id'],
+            'name'  => (string) $row['name'],
+            'email' => (string) $row['email'],
+            'role'  => (string) $row['role'],
+        ], $rows);
     }
 
     public static function attempt(string $email, string $password): bool
     {
         $email = strtolower(trim($email));
-        $match = null;
-        foreach (self::users() as $u) {
-            if (hash_equals($u['email'], $email)) {
-                $match = $u;
-                break;
-            }
-        }
+        $match = db()->fetchOne(
+            'SELECT id, name, email, password_hash, role FROM users WHERE email = :email AND is_active = 1 LIMIT 1',
+            ['email' => $email]
+        );
 
-        // Tetap jalankan password_verify walau user tidak ditemukan (mitigasi timing attack)
-        $hash = $match['password'] ?? '$2y$10$emcKewURNuEhOxEA3JlOPOIiu5qMeOc9V41.YpiWp5MJizow75WHO';
+        // Run password_verify even when the email does not exist to prevent timing enumeration.
+        $hash = (string) ($match['password_hash'] ?? '$2y$10$emcKewURNuEhOxEA3JlOPOIiu5qMeOc9V41.YpiWp5MJizow75WHO');
         $valid = password_verify($password, $hash);
         if (!$valid || $match === null) {
             return false;
         }
 
-        session_regenerate_id(true); // cegah session fixation
+        session_regenerate_id(true);
         $_SESSION['user'] = [
-            'id'    => $match['id'],
-            'name'  => $match['name'],
-            'email' => $match['email'],
-            'role'  => $match['role'],
+            'id'    => (int) $match['id'],
+            'name'  => (string) $match['name'],
+            'email' => (string) $match['email'],
+            'role'  => (string) $match['role'],
         ];
         $_SESSION['login_at'] = time();
         return true;

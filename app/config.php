@@ -10,8 +10,14 @@ define('BASE_PATH', dirname(__DIR__));
 define('APP_PATH', BASE_PATH . '/app');
 define('VIEW_PATH', APP_PATH . '/views');
 define('STORAGE_PATH', BASE_PATH . '/storage');
-define('DATA_FILE', STORAGE_PATH . '/data.json');
 define('UPLOAD_PATH', STORAGE_PATH . '/uploads');
+
+define('DB_HOST', getenv('DB_HOST') ?: '127.0.0.1');
+define('DB_PORT', getenv('DB_PORT') ?: '3306');
+define('DB_NAME', getenv('DB_NAME') ?: 'vulntrack');
+define('DB_USER', getenv('DB_USER') ?: 'root');
+define('DB_PASS', getenv('DB_PASS') !== false ? getenv('DB_PASS') : '');
+define('DB_CHARSET', getenv('DB_CHARSET') ?: 'utf8mb4');
 
 define('POC_MAX_BYTES', 2 * 1024 * 1024);
 define('POC_ALLOWED', [

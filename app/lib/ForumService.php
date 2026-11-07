@@ -25,7 +25,7 @@ final class ForumService
         ],
     ];
 
-    public function __construct(private JsonStore $store)
+    public function __construct(private Database $db)
     {
     }
 
@@ -41,77 +41,105 @@ final class ForumService
 
     public function categoryCounts(): array
     {
-        $threads = $this->store->collection('forum_threads');
-        $counts = ['all' => count($threads)];
+        $counts = ['all' => 0];
         foreach (self::CATEGORIES as $slug => $_) {
             $counts[$slug] = 0;
         }
-        foreach ($threads as $t) {
-            $cat = (string) ($t['category'] ?? '');
+
+        $rows = $this->db->fetchAll(
+            'SELECT category, COUNT(*) AS total
+             FROM forum_posts
+             WHERE parent_id IS NULL
+             GROUP BY category'
+        );
+
+        foreach ($rows as $row) {
+            $cat = (string) ($row['category'] ?? '');
+            $cnt = (int) $row['total'];
             if (isset($counts[$cat])) {
-                $counts[$cat]++;
+                $counts[$cat] = $cnt;
+                $counts['all'] += $cnt;
             }
         }
+
         return $counts;
     }
 
     public function threads(?string $category = null): array
     {
-        $data = $this->store->read();
-        $threads = $data['forum_threads'] ?? [];
-        $replies = $data['forum_replies'] ?? [];
-
-        $replyCounts = [];
-        foreach ($replies as $r) {
-            $tid = (int) ($r['thread_id'] ?? 0);
-            $replyCounts[$tid] = ($replyCounts[$tid] ?? 0) + 1;
-        }
+        $params = [];
+        $where  = 'p.parent_id IS NULL';
 
         if ($category !== null && $category !== '' && isset(self::CATEGORIES[$category])) {
-            $threads = array_values(array_filter(
-                $threads,
-                fn (array $t): bool => ($t['category'] ?? '') === $category
-            ));
+            $where .= ' AND p.category = :category';
+            $params['category'] = $category;
         }
 
-        foreach ($threads as &$t) {
-            $tid = (int) $t['id'];
-            $t['reply_count'] = $replyCounts[$tid] ?? 0;
-            $t['updated_at'] = $t['updated_at'] ?? $t['created_at'];
-        }
-        unset($t);
-
-        usort(
-            $threads,
-            fn (array $a, array $b): int => strcmp((string) $b['updated_at'], (string) $a['updated_at']) ?: ((int) $b['id'] <=> (int) $a['id'])
+        $rows = $this->db->fetchAll(
+            "SELECT p.id, p.user_id, p.category, p.subject, p.message, p.created_at, p.updated_at,
+                    COUNT(r.id) AS reply_count
+             FROM forum_posts p
+             LEFT JOIN forum_posts r ON r.parent_id = p.id
+             WHERE {$where}
+             GROUP BY p.id, p.user_id, p.category, p.subject, p.message, p.created_at, p.updated_at
+             ORDER BY p.updated_at DESC, p.id DESC",
+            $params
         );
 
-        return $threads;
+        if (!$rows) {
+            return [];
+        }
+
+        $subsByPost = $this->subscriptionsMap();
+        return array_map(
+            static fn (array $row): array => self::normalizeThread($row, $subsByPost[(int) $row['id']] ?? []),
+            $rows
+        );
     }
 
     public function findThread(int $id): ?array
     {
-        foreach ($this->store->collection('forum_threads') as $t) {
-            if ((int) $t['id'] === $id) {
-                return $t;
-            }
+        $row = $this->db->fetchOne(
+            'SELECT p.id, p.user_id, p.category, p.subject, p.message, p.created_at, p.updated_at,
+                    COUNT(r.id) AS reply_count
+             FROM forum_posts p
+             LEFT JOIN forum_posts r ON r.parent_id = p.id
+             WHERE p.id = :id AND p.parent_id IS NULL
+             GROUP BY p.id, p.user_id, p.category, p.subject, p.message, p.created_at, p.updated_at
+             LIMIT 1',
+            ['id' => $id]
+        );
+
+        if ($row === null) {
+            return null;
         }
-        return null;
+
+        $subRows = $this->db->fetchAll(
+            'SELECT user_id FROM forum_subscriptions WHERE post_id = :pid',
+            ['pid' => $id]
+        );
+        $subs = array_map(static fn (array $s): int => (int) $s['user_id'], $subRows);
+
+        return self::normalizeThread($row, $subs);
     }
 
     public function repliesForThread(int $threadId): array
     {
-        $replies = array_values(array_filter(
-            $this->store->collection('forum_replies'),
-            fn (array $r): bool => (int) ($r['thread_id'] ?? 0) === $threadId
-        ));
-
-        usort(
-            $replies,
-            fn (array $a, array $b): int => strcmp((string) $a['created_at'], (string) $b['created_at']) ?: ((int) $a['id'] <=> (int) $b['id'])
+        $rows = $this->db->fetchAll(
+            'SELECT id, parent_id AS thread_id, user_id, message, created_at
+             FROM forum_posts
+             WHERE parent_id = :tid
+             ORDER BY created_at ASC, id ASC',
+            ['tid' => $threadId]
         );
 
-        return $replies;
+        return array_map(static fn (array $r): array => [
+            'id'         => (int) $r['id'],
+            'thread_id'  => (int) $r['thread_id'],
+            'user_id'    => (int) $r['user_id'],
+            'message'    => (string) $r['message'],
+            'created_at' => (string) $r['created_at'],
+        ], $rows);
     }
 
     public function isSubscribed(array $thread, int $userId): bool
@@ -142,21 +170,29 @@ final class ForumService
             throw new ValidationException($errors);
         }
 
-        return $this->store->transaction(function (array &$data) use ($category, $subject, $message, $follow, $user): int {
-            $id  = JsonStore::nextId($data, 'forum_threads');
+        return $this->db->transaction(function (Database $db) use ($category, $subject, $message, $follow, $user): int {
             $now = date('Y-m-d H:i:s');
             $uid = (int) $user['id'];
 
-            $data['forum_threads'][] = [
-                'id'             => $id,
-                'category'       => $category,
-                'user_id'        => $uid,
-                'subject'        => $subject,
-                'message'        => $message,
-                'subscriber_ids' => $follow ? [$uid] : [],
-                'created_at'     => $now,
-                'updated_at'     => $now,
-            ];
+            $id = $db->insert(
+                'INSERT INTO forum_posts (parent_id, user_id, category, subject, message, created_at, updated_at)
+                 VALUES (NULL, :uid, :category, :subject, :message, :created_at, :updated_at)',
+                [
+                    'uid'        => $uid,
+                    'category'   => $category,
+                    'subject'    => $subject,
+                    'message'    => $message,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ]
+            );
+
+            if ($follow) {
+                $db->execute(
+                    'INSERT INTO forum_subscriptions (post_id, user_id, created_at) VALUES (:pid, :uid, :created_at)',
+                    ['pid' => $id, 'uid' => $uid, 'created_at' => $now]
+                );
+            }
 
             return $id;
         });
@@ -178,25 +214,26 @@ final class ForumService
             throw new ValidationException($errors);
         }
 
-        return $this->store->transaction(function (array &$data) use ($threadId, $message, $user): int {
+        return $this->db->transaction(function (Database $db) use ($threadId, $message, $user): int {
             $now = date('Y-m-d H:i:s');
-            $replyId = JsonStore::nextId($data, 'forum_replies');
+            $uid = (int) $user['id'];
 
-            $data['forum_replies'][] = [
-                'id'         => $replyId,
-                'thread_id'  => $threadId,
-                'user_id'    => (int) $user['id'],
-                'message'    => $message,
-                'created_at' => $now,
-            ];
+            $replyId = $db->insert(
+                'INSERT INTO forum_posts (parent_id, user_id, category, subject, message, created_at, updated_at)
+                 VALUES (:parent_id, :uid, NULL, NULL, :message, :created_at, :updated_at)',
+                [
+                    'parent_id'  => $threadId,
+                    'uid'        => $uid,
+                    'message'    => $message,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ]
+            );
 
-            foreach ($data['forum_threads'] as &$thread) {
-                if ((int) $thread['id'] === $threadId) {
-                    $thread['updated_at'] = $now;
-                    break;
-                }
-            }
-            unset($thread);
+            $db->execute(
+                'UPDATE forum_posts SET updated_at = :updated_at WHERE id = :id AND parent_id IS NULL',
+                ['updated_at' => $now, 'id' => $threadId]
+            );
 
             return $replyId;
         });
@@ -204,22 +241,53 @@ final class ForumService
 
     public function toggleSubscribe(int $threadId, int $userId): bool
     {
-        return $this->store->transaction(function (array &$data) use ($threadId, $userId): bool {
-            foreach ($data['forum_threads'] as &$thread) {
-                if ((int) $thread['id'] !== $threadId) {
-                    continue;
-                }
-                $subs = array_values(array_unique(array_map('intval', $thread['subscriber_ids'] ?? [])));
-                if (in_array($userId, $subs, true)) {
-                    $thread['subscriber_ids'] = array_values(array_filter($subs, fn (int $id): bool => $id !== $userId));
-                    return false;
-                }
-                $subs[] = $userId;
-                $thread['subscriber_ids'] = $subs;
-                return true;
+        return $this->db->transaction(function (Database $db) use ($threadId, $userId): bool {
+            $exists = $db->fetchValue(
+                'SELECT 1 FROM forum_subscriptions WHERE post_id = :pid AND user_id = :uid LIMIT 1',
+                ['pid' => $threadId, 'uid' => $userId]
+            );
+
+            if ($exists !== null) {
+                $db->execute(
+                    'DELETE FROM forum_subscriptions WHERE post_id = :pid AND user_id = :uid',
+                    ['pid' => $threadId, 'uid' => $userId]
+                );
+                return false;
             }
-            unset($thread);
-            return false;
+
+            $db->execute(
+                'INSERT INTO forum_subscriptions (post_id, user_id, created_at) VALUES (:pid, :uid, :created_at)',
+                ['pid' => $threadId, 'uid' => $userId, 'created_at' => date('Y-m-d H:i:s')]
+            );
+            return true;
         });
+    }
+
+    /** @return array<int, list<int>> */
+    private function subscriptionsMap(): array
+    {
+        $rows = $this->db->fetchAll('SELECT post_id, user_id FROM forum_subscriptions');
+        $map  = [];
+        foreach ($rows as $row) {
+            $pid = (int) $row['post_id'];
+            $map[$pid][] = (int) $row['user_id'];
+        }
+        return $map;
+    }
+
+    /** @param list<int> $subscriberIds */
+    private static function normalizeThread(array $row, array $subscriberIds): array
+    {
+        return [
+            'id'             => (int) $row['id'],
+            'category'       => (string) $row['category'],
+            'user_id'        => (int) $row['user_id'],
+            'subject'        => (string) $row['subject'],
+            'message'        => (string) $row['message'],
+            'subscriber_ids' => $subscriberIds,
+            'reply_count'    => (int) ($row['reply_count'] ?? 0),
+            'created_at'     => (string) $row['created_at'],
+            'updated_at'     => (string) ($row['updated_at'] ?? $row['created_at']),
+        ];
     }
 }

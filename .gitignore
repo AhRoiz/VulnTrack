@@ -1,10 +1,10 @@
-# Data runtime (dibuat otomatis dari app/seed.php)
-/storage/data.json
+# File lampiran PoC runtime
 /storage/uploads/*
 !/storage/uploads/.gitkeep
 
 /redesign.md
 /agent.md
+/database.md
 
 # OS / editor
 .DS_Store
